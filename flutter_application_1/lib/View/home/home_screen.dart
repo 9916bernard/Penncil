@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/View/home/login/login_screen.dart';
 
@@ -9,6 +10,28 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final _authentication = FirebaseAuth.instance;
+  User? loggedUser;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getCurrentUser();
+  }
+
+  void getCurrentUser() {
+    final user = _authentication.currentUser;
+    try {
+      if (user != null) {
+        loggedUser = user;
+        print(loggedUser!.email);
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
   int _selectedIndex =
       0; // The default selected index for the BottomNavigationBar
 
@@ -144,6 +167,7 @@ class ChatScreen extends StatelessWidget {
 }
 
 class ProfileScreen extends StatelessWidget {
+  final _authentication = FirebaseAuth.instance;
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -152,6 +176,8 @@ class ProfileScreen extends StatelessWidget {
       children: [
         TextButton(
             onPressed: () {
+              _authentication.signOut();
+
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => LoginScreen()),

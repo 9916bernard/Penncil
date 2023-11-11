@@ -1,16 +1,15 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/View/home/home_screen.dart';
-import 'package:flutter_application_1/View/home/login/signup_screen.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class SignupScreen extends StatefulWidget {
+  const SignupScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<SignupScreen> createState() => _SignupScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _SignupScreenState extends State<SignupScreen> {
   // Controllers to retrieve text from text fields
   final _authentication = FirebaseAuth.instance;
   final _formKey = GlobalKey<FormState>();
@@ -30,7 +29,7 @@ class _LoginScreenState extends State<LoginScreen> {
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
         // Using AppBar for the back button
-        title: Text("Login"),
+        title: Text("Sign up"),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
@@ -45,7 +44,7 @@ class _LoginScreenState extends State<LoginScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               TextFormField(
-                key: ValueKey(3),
+                key: ValueKey(1),
                 validator: (value) {
                   if (value!.isEmpty || !value.contains('@')) {
                     return 'Please enter a valid email address';
@@ -66,7 +65,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               SizedBox(height: 20),
               TextFormField(
-                key: ValueKey(4),
+                key: ValueKey(2),
                 validator: (value) {
                   if (value!.isEmpty || value.length < 6) {
                     return 'Please enter at least 6 characters';
@@ -91,13 +90,17 @@ class _LoginScreenState extends State<LoginScreen> {
                   _tryValidation();
                   try {
                     final newUser =
-                        await _authentication.signInWithEmailAndPassword(
+                        await _authentication.createUserWithEmailAndPassword(
                             email: userEmail, password: userPassword);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => HomeScreen()),
-                    );
-                  } on FirebaseAuthException catch (e) {
+
+                    if (newUser.user != null) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => HomeScreen()),
+                      );
+                    }
+                  } catch (e) {
+                    print(e);
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(e.toString()),
@@ -105,16 +108,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     );
                   }
                 },
-                child: Text('Login'),
-              ),
-              TextButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => SignupScreen()),
-                  );
-                },
-                child: Text('Don\'t have an account? Sign up'),
+                child: Text('Sign up'),
               ),
             ],
           ),
