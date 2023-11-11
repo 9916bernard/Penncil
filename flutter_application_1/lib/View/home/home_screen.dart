@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/View/home/login/login_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -146,7 +147,18 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-        child: Text(
-            'Profile Screen Content')); // Basic content for the profile screen
+        child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        TextButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => LoginScreen()),
+              );
+            },
+            child: Text("Logout")),
+      ],
+    )); // Basic content for the profile screen
   }
 }
