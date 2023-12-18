@@ -1,6 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/View/home/login/login_screen.dart';
+import 'package:flutter_application_1/View/home/chat_screen.dart';
+import 'package:flutter_application_1/View/home/main_screen.dart';
+import 'package:flutter_application_1/View/home/profile_screen.dart';
+import 'package:flutter_application_1/View/login/login_screen.dart';
+import 'package:flutter_application_1/View/home/chat_screen.dart';
+import 'package:flutter_application_1/View/home/profile_screen.dart';
+import 'package:flutter_application_1/View/home/main_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -37,85 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // Pages that correspond to the tabs in the BottomNavigationBar
   final List<Widget> _pages = <Widget>[
-    Center(
-        child: Scaffold(
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextField(
-                  decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'Search',
-                      hintText: 'Enter search term'),
-                ),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  Container(
-                    height: 150,
-                    width: 150,
-                    decoration: BoxDecoration(border: Border.all()),
-                    child: TextButton(
-                      onPressed: () {
-                        // Your button press logic here.
-                      },
-                      child: Text('Class 101'),
-                    ),
-                  ),
-                  Container(
-                    height: 150,
-                    width: 150,
-                    decoration: BoxDecoration(border: Border.all()),
-                    child: TextButton(
-                      onPressed: () {
-                        // Your button press logic here.
-                      },
-                      child: Text('Class 102'),
-                    ),
-                  ),
-                ],
-              ),
-              Container(
-                height: 10,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  Container(
-                    height: 150,
-                    width: 150,
-                    decoration: BoxDecoration(border: Border.all()),
-                    child: TextButton(
-                      onPressed: () {
-                        // Your button press logic here.
-                      },
-                      child: Text('Class 103'),
-                    ),
-                  ),
-                  Container(
-                    height: 150,
-                    width: 150,
-                    decoration: BoxDecoration(border: Border.all()),
-                    child: TextButton(
-                      onPressed: () {
-                        // Your button press logic here.
-                      },
-                      child: Text('Class 104'),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    )), // Home screen content
+    MainScreen(),
     ChatScreen(), // Chat screen
     ProfileScreen(), // Profile screen
   ];
@@ -130,7 +58,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Flutter Bottom Navigation Demo'),
+        title: Text('Studygroup Demo'),
       ),
       body: _pages[
           _selectedIndex], // Display the page selected by the bottom navigation bar
@@ -154,37 +82,5 @@ class _HomeScreenState extends State<HomeScreen> {
         onTap: _onItemTapped,
       ),
     );
-  }
-}
-
-class ChatScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-        child:
-            Text('Chat Screen Content')); // Basic content for the chat screen
-  }
-}
-
-class ProfileScreen extends StatelessWidget {
-  final _authentication = FirebaseAuth.instance;
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-        child: Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        TextButton(
-            onPressed: () {
-              _authentication.signOut();
-
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => LoginScreen()),
-              );
-            },
-            child: Text("Logout")),
-      ],
-    )); // Basic content for the profile screen
   }
 }
