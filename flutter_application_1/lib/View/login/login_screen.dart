@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/View/home/home_screen.dart';
+import 'package:flutter_application_1/View/home/main_screen.dart';
 import 'package:flutter_application_1/View/login/signup_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -44,6 +45,13 @@ class _LoginScreenState extends State<LoginScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              TextButton(onPressed: () {
+                Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => HomeScreen()),
+                    );
+
+              }, child: Text('Free pass')),
               TextFormField(
                 key: ValueKey(3),
                 validator: (value) {
