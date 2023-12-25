@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_application_1/View/home/chat/widgets/message_widget.dart';
+import 'package:flutter_application_1/View/home/chat/widgets/send_message_widget.dart';
 
 class Chatroom extends StatefulWidget {
   const Chatroom({super.key});
@@ -20,64 +22,18 @@ class _ChatroomState extends State<Chatroom> {
         title: Text('Chatroom', style: TextStyle(fontSize: 18)), // Small title
       ),
       body: 
-      StreamBuilder(
-        stream: FirebaseFirestore.instance.collection('chats/aSxIFTC1GpObrgriv3Iu/message').snapshots(),
-        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot<Map<String,dynamic>>> snapshot){
-          if(snapshot.connectionState == ConnectionState.waiting){
-            return Center(child: CircularProgressIndicator());
-          }
-          
-          final docs = snapshot.data!.docs;
+      Column(children: [
+        Expanded(child: MessageWidget()),
 
-          return Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Align(
-                    alignment: Alignment.topLeft,
-                    child: ListView.builder(
-                      itemCount: docs.length,
-                      itemBuilder: (context, index) {
-                        return Container(
-                          margin: EdgeInsets.all(10),  // Adjust spacing as needed
-                          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                          decoration: BoxDecoration(
-                            color: Colors.grey[200],  // Grey message container
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Text(
-                            docs[index]['text'],
-                            style: TextStyle(color: Colors.black),
-                          ),
-                        );
-                      },
-                      
-                    ),
-                  ),
-                ),
-                Align(
-                  alignment: Alignment.bottomCenter,
-                  child: Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: TextField(
-                      decoration: InputDecoration(
-                        hintText: 'Type a message...',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        filled: true,
-                        fillColor: Colors.grey[200],
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          );
-        }
-      ),
+        SendMessageWidget(),
+      ],)
+      
     );
   }
 }
+
+
+// Align(
+//                   alignment: Alignment.bottomCenter,
+//                   child: 
+//                 ),

@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/View/home/home_screen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -13,6 +14,7 @@ class _SignupScreenState extends State<SignupScreen> {
   // Controllers to retrieve text from text fields
   final _authentication = FirebaseAuth.instance;
   final _formKey = GlobalKey<FormState>();
+  String userName = '';
   String userEmail = '';
   String userPassword = '';
 
@@ -43,6 +45,28 @@ class _SignupScreenState extends State<SignupScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              TextFormField(
+                key: ValueKey(3),
+                validator: (value) {
+                  if (value!.isEmpty || value.length < 4) {
+                    return 'Please enter at least 4 characters';
+                  }
+                  return null;
+                },
+                onSaved: (value) {
+                  userName = value!;
+                },
+                onChanged: (value) {
+                  userName = value;
+                },
+                decoration: InputDecoration(
+                  labelText: 'User Name',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+
+              SizedBox(height: 20),
+
               TextFormField(
                 key: ValueKey(1),
                 validator: (value) {
@@ -92,6 +116,11 @@ class _SignupScreenState extends State<SignupScreen> {
                     final newUser =
                         await _authentication.createUserWithEmailAndPassword(
                             email: userEmail, password: userPassword);
+
+                            await FirebaseFirestore.instance.collection('users').doc(newUser.user!.uid).set({
+                              'username': userName, 
+                              'email': userEmail,
+                            });
 
                     if (newUser.user != null) {
                       Navigator.push(
