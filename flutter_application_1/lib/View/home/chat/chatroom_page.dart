@@ -31,9 +31,3 @@ class _ChatroomState extends State<Chatroom> {
     );
   }
 }
-
-
-// Align(
-//                   alignment: Alignment.bottomCenter,
-//                   child: 
-//                 ),
