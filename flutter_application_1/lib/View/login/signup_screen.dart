@@ -1,7 +1,11 @@
+import 'dart:io';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/View/global_widgets/add_image_widget.dart';
 import 'package:flutter_application_1/View/home/home_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -17,6 +21,11 @@ class _SignupScreenState extends State<SignupScreen> {
   String userName = '';
   String userEmail = '';
   String userPassword = '';
+  File? userPickedImage;
+
+  void pickedImage(File image){
+    userPickedImage = image;
+  }
 
   void _tryValidation() {
     final isValid = _formKey.currentState!.validate();
@@ -25,26 +34,30 @@ class _SignupScreenState extends State<SignupScreen> {
     }
   }
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
         // Using AppBar for the back button
-        title: Text("Sign up"),
+        title: const Text("Sign up"),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
         ),
       ),
       body: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              AddImageWidget(pickedImage),
+             
+              const SizedBox(height: 20),
               TextFormField(
                 key: ValueKey(3),
                 validator: (value) {
@@ -65,7 +78,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 ),
               ),
 
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
 
               TextFormField(
                 key: ValueKey(1),
@@ -113,14 +126,31 @@ class _SignupScreenState extends State<SignupScreen> {
                 onPressed: () async {
                   _tryValidation();
                   try {
+
+                    if (userPickedImage == null) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text('Please pick an image first!'),
+    ),
+  );
+  return; // Stop the function if no image was picked.
+}
                     final newUser =
                         await _authentication.createUserWithEmailAndPassword(
                             email: userEmail, password: userPassword);
 
+                            final refImage = FirebaseStorage.instance.ref().child('user_images').child(newUser.user!.uid + '.jpg');
+
+                            await refImage.putFile(userPickedImage!);
+
+                            final url = await refImage.getDownloadURL();
+
                             await FirebaseFirestore.instance.collection('users').doc(newUser.user!.uid).set({
                               'userName': userName, 
                               'email': userEmail,
+                              'pickedImage': url,
                             });
+
 
                     if (newUser.user != null) {
                       Navigator.push(

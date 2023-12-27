@@ -59,6 +59,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Studygroup Demo'),
+         automaticallyImplyLeading: false,
       ),
       body: _pages[
           _selectedIndex], // Display the page selected by the bottom navigation bar

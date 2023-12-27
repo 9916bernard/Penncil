@@ -45,5 +45,11 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSPhotoLibraryUsageDescription</key>
+    <string>To get image of user profile or send image through chat</string>
+    <key>NSCameraUsageDescription</key>
+    <string>To get image of user profile or send image through chat</string>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>To properly send the video when user wants</string>
 </dict>
 </plist>

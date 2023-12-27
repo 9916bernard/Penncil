@@ -23,6 +23,7 @@ class _SendMessageWidgetState extends State<SendMessageWidget> {
       'time': Timestamp.now(),
       'userId': user!.uid,
       'userName': userData.data()!['userName'],
+      'userImage': userData['pickedImage'],
     });
     _controller.clear();
   }

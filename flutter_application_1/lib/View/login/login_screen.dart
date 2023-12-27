@@ -32,10 +32,7 @@ class _LoginScreenState extends State<LoginScreen> {
       appBar: AppBar(
         // Using AppBar for the back button
         title: Text("Login"),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
+        
       ),
       body: Padding(
         padding: EdgeInsets.all(16.0),
