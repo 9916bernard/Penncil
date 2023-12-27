@@ -118,7 +118,7 @@ class _SignupScreenState extends State<SignupScreen> {
                             email: userEmail, password: userPassword);
 
                             await FirebaseFirestore.instance.collection('users').doc(newUser.user!.uid).set({
-                              'username': userName, 
+                              'userName': userName, 
                               'email': userEmail,
                             });
 
@@ -132,7 +132,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     print(e);
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text(e.toString()),
+                        content: Text(e.toString()), 
                       ),
                     );
                   }

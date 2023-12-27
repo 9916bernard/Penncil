@@ -1,36 +1,48 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_chat_bubble/chat_bubble.dart';
+import 'package:flutter_chat_bubble/bubble_type.dart';
+import 'package:flutter_chat_bubble/clippers/chat_bubble_clipper_8.dart';
 
-class ChatBubble extends StatelessWidget {
-  const ChatBubble(this.message, this.isMe, {Key? key}) : super(key: key);
+class ChatBubbles extends StatelessWidget {
+  const ChatBubbles(this.message, this.isMe, this.userName, {Key? key}) : super(key: key);
 
   final String message;
+  final String userName;
   final bool isMe;
 
   
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
       children: [
-        Container(
-          width: 125,
-          margin: EdgeInsets.all(10),  // Adjust spacing as needed
-          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-          decoration: BoxDecoration(
-            color: isMe ? Colors.blue : Colors.grey[200],  // Grey message container
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(15),
-              topRight: Radius.circular(15),
-              bottomLeft: isMe ? Radius.circular(15) : Radius.circular(0),
-              bottomRight: isMe ? Radius.circular(0) : Radius.circular(15),
+        Text(
+          userName,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.grey,
+          ),),
+        Row(
+          mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+          children: [
+            ChatBubble(
+              clipper: ChatBubbleClipper8(type: isMe ? BubbleType.sendBubble : BubbleType.receiverBubble),
+              alignment: isMe ? Alignment.topRight : Alignment.topLeft,
+              margin: const EdgeInsets.only(bottom: 10),
+              backGroundColor: isMe ? Colors.blue : Colors.grey[300],
+              child: Container(
+                constraints: BoxConstraints(
+                  maxWidth: MediaQuery.of(context).size.width * 0.7,
+                ),
+                child: Text(
+                  message,
+                  style: TextStyle(color: isMe ? Colors.white : Colors.black),
+                ),
+              ),
+            ),
             
-              
-            )
-          ),
-          child: Text(
-            message,
-            style: TextStyle(color: isMe? Colors.white : Colors.black),
-          ),
+          ],
         ),
       ],
     );

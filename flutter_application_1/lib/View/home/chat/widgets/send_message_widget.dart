@@ -14,13 +14,15 @@ class _SendMessageWidgetState extends State<SendMessageWidget> {
 
   var _enteredMessage = '';
 
-  void _sendMessage() {
+  void _sendMessage() async{
     FocusScope.of(context).unfocus();
     final user = FirebaseAuth.instance.currentUser;
+    final userData = await FirebaseFirestore.instance.collection('users').doc(user!.uid).get();
     FirebaseFirestore.instance.collection('chats/aSxIFTC1GpObrgriv3Iu/message').add({
       'text': _enteredMessage,
       'time': Timestamp.now(),
       'userId': user!.uid,
+      'userName': userData.data()!['userName'],
     });
     _controller.clear();
   }

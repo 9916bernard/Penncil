@@ -21,7 +21,7 @@ class MessageWidget extends StatelessWidget {
           final docs = snapshot.data!.docs;
 
           return Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.only(left: 5, right: 5),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
@@ -31,8 +31,9 @@ class MessageWidget extends StatelessWidget {
                     reverse: true,
                     itemCount: docs.length,
                     itemBuilder: (context, index) {
-                      return ChatBubble(docs[index]['text'],
-                      docs[index]['userId'].toString() == user!.uid
+                      return ChatBubbles(docs[index]['text'],
+                      docs[index]['userId'].toString() == user!.uid,
+                      docs[index]['userName'],
                       );
                     },
                     
