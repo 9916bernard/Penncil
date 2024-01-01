@@ -3,10 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/View/home/chat/chat_screen.dart';
 import 'package:flutter_application_1/View/home/main_screen.dart';
 import 'package:flutter_application_1/View/home/profile_screen.dart';
-import 'package:flutter_application_1/View/login/login_screen.dart';
-import 'package:flutter_application_1/View/home/chat/chat_screen.dart';
-import 'package:flutter_application_1/View/home/profile_screen.dart';
-import 'package:flutter_application_1/View/home/main_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
