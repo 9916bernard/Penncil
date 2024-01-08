@@ -1,8 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/View/home/chat/chat_screen.dart';
-import 'package:flutter_application_1/View/home/main_screen.dart';
-import 'package:flutter_application_1/View/home/profile_screen.dart';
+import 'package:flutter_application_1/View/home/main/main_screen.dart';
+import 'package:flutter_application_1/View/home/profile/profile_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -55,7 +55,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Studygroup Demo'),
-         automaticallyImplyLeading: false,
+        automaticallyImplyLeading: false,
       ),
       body: _pages[
           _selectedIndex], // Display the page selected by the bottom navigation bar

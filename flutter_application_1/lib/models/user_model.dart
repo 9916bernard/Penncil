@@ -5,12 +5,14 @@ class AppUser {
   final String userName;
   final String email;
   final String profileImageUrl;
+  final List<String> enrolledCourses; // Add this new field
 
   AppUser({
     required this.id,
     required this.userName,
     required this.email,
     required this.profileImageUrl,
+    required this.enrolledCourses, // Initialize this new field
   });
 
   factory AppUser.fromFirestore(DocumentSnapshot doc) {
@@ -20,6 +22,8 @@ class AppUser {
       userName: data['userName'] ?? '',
       email: data['email'] ?? '',
       profileImageUrl: data['pickedImage'] ?? '',
+      enrolledCourses: List.from(data['enrolledCourses'] ??
+          []), // Extract the enrolledCourses from the document, defaulting to an empty list if it's not present
     );
   }
 }

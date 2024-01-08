@@ -8,7 +8,8 @@ class ChatScreen extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           children: <Widget>[
-            _buildChatRoomItem(context, 'Chatroom 1'), // Pass context here
+            _buildChatRoomItem(
+                context, 'Open Groupchat 1'), // Pass context here
           ],
         ),
       ),
@@ -30,7 +31,7 @@ class ChatScreen extends StatelessWidget {
             // Navigate to the chatroom page when tapped
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => Chatroom()), 
+              MaterialPageRoute(builder: (context) => Chatroom()),
             );
           },
         ),
