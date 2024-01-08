@@ -54,7 +54,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Studygroup Demo'),
+        title: Text('Penncil'),
         automaticallyImplyLeading: false,
       ),
       body: _pages[

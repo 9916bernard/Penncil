@@ -28,7 +28,12 @@ class MainScreen extends StatelessWidget {
                         hintText: 'Enter search term'),
                   ),
                 ),
-                AddCourseWidget(), // Existing Add Course Widget
+
+                SizedBox(height: 20),
+                Text('Your Courses',
+                    style:
+                        TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+                SizedBox(height: 10),
 
                 // Check if user is not null
                 if (user != null && user.enrolledCourses.isNotEmpty)
@@ -76,6 +81,7 @@ class MainScreen extends StatelessWidget {
                   )
                 else
                   Text("You are not enrolled in any courses."),
+                AddCourseWidget(),
               ],
             ),
           ),
