@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/View/global_widgets/add_course_widget.dart';
+import 'package:flutter_application_1/View/home/main/course_detail_screen.dart';
 import 'package:flutter_application_1/models/course_model.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_application_1/providers/course_provider.dart'; // Import your CourseProvider
@@ -19,11 +21,11 @@ class _SearchScreenState extends State<SearchScreen> {
     courseProvider.fetchCourses();
 
     List<Course> displayedCourses = searchQuery.isEmpty
-        ? courseProvider.courses
+        ? courseProvider.courses // 검색창에 아무것도 안들어갔을때
         : courseProvider.courses
             .where((course) =>
                 course.name.toLowerCase().contains(searchQuery.toLowerCase()))
-            .toList();
+            .toList(); // 검색창에 뭐 들어갔을때
 
     return Scaffold(
       body: Column(
@@ -52,12 +54,20 @@ class _SearchScreenState extends State<SearchScreen> {
                   title: Text(course.name),
                   subtitle: Text(course.description),
                   onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              CourseDetailScreen(courseId: course.id)),
+                    );
                     // Define action on tap, like navigating to a course detail screen
                   },
                 );
               },
             ),
           ),
+          Text('Cant find the course?'),
+          AddCourseWidget(),
         ],
       ),
     );

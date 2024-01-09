@@ -27,5 +27,33 @@ class CourseProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  // Add more methods as needed...
+  Future<void> enrollInCourse(String courseId, String userId) async {
+    await FirebaseFirestore.instance
+        .collection('courses')
+        .doc(courseId)
+        .update({
+      'enrolledUsers': FieldValue.arrayUnion([userId])
+    });
+
+    await FirebaseFirestore.instance.collection('users').doc(userId).update({
+      'enrolledCourses': FieldValue.arrayUnion([courseId])
+    });
+
+    notifyListeners(); // Notify listeners to rebuild the UI if needed
+  }
+
+  Future<void> removeFromCourse(String courseId, String userId) async {
+    await FirebaseFirestore.instance
+        .collection('courses')
+        .doc(courseId)
+        .update({
+      'enrolledUsers': FieldValue.arrayRemove([userId])
+    });
+
+    await FirebaseFirestore.instance.collection('users').doc(userId).update({
+      'enrolledCourses': FieldValue.arrayRemove([courseId])
+    });
+
+    notifyListeners(); // Notify listeners to rebuild the UI if needed
+  }
 }
