@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/View/home/chat/chat_screen.dart';
 import 'package:flutter_application_1/View/home/main/main_screen.dart';
 import 'package:flutter_application_1/View/home/profile/profile_screen.dart';
+import 'package:flutter_application_1/View/home/search_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -17,7 +18,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     getCurrentUser();
   }
@@ -40,6 +40,7 @@ class _HomeScreenState extends State<HomeScreen> {
   // Pages that correspond to the tabs in the BottomNavigationBar
   final List<Widget> _pages = <Widget>[
     MainScreen(),
+    SearchScreen(),
     ChatScreen(), // Chat screen
     ProfileScreen(), // Profile screen
   ];
@@ -66,6 +67,10 @@ class _HomeScreenState extends State<HomeScreen> {
             label: 'Home',
           ),
           BottomNavigationBarItem(
+            icon: Icon(Icons.search),
+            label: 'Search',
+          ),
+          BottomNavigationBarItem(
             icon: Icon(Icons.chat),
             label: 'Chat',
           ),
@@ -76,6 +81,8 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
         currentIndex: _selectedIndex,
         selectedItemColor: Colors.deepPurple[800],
+        unselectedItemColor: Colors
+            .grey[600], // Adjust unselected item color for better visibility
         onTap: _onItemTapped,
       ),
     );
