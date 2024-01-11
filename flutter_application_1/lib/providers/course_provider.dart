@@ -16,7 +16,7 @@ class CourseProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  // Fetch courses for a specific user
+  // Fetch courses for a specific user (유저의 courses)
   Future<void> fetchUserCourses(String userId) async {
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
         .collection('courses')
@@ -27,6 +27,23 @@ class CourseProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  // Fetch course details from Firestore (course의 정보)
+  Future<Course?> fetchCourseDetails(String courseId) async {
+    try {
+      DocumentSnapshot docSnapshot = await FirebaseFirestore.instance
+          .collection('courses')
+          .doc(courseId)
+          .get();
+      if (docSnapshot.exists) {
+        return Course.fromFirestore(docSnapshot);
+      }
+    } catch (e) {
+      // Handle errors or log them
+    }
+    return null; // Return null if course is not found or an error occurs
+  }
+
+  // Add a new course to Firestore
   Future<void> enrollInCourse(String courseId, String userId) async {
     await FirebaseFirestore.instance
         .collection('courses')

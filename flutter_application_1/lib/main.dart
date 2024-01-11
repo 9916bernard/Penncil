@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/View/login/login_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_application_1/providers/chat_provider.dart';
 import 'package:flutter_application_1/providers/course_provider.dart';
 import 'package:flutter_application_1/providers/user_data_provider.dart';
 import 'package:provider/provider.dart';
@@ -16,6 +17,7 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: (context) => UserDataProvider()),
         ChangeNotifierProvider(create: (context) => CourseProvider()),
+        ChangeNotifierProvider(create: (context) => ChatProvider()),
       ],
       child: MyApp(),
     ),

@@ -120,5 +120,38 @@ class UserDataProvider with ChangeNotifier {
         print(e);
       }
     }
+
+    Future<AppUser?> fetchUserDetails(String userId) async {
+      try {
+        DocumentSnapshot userDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(userId)
+            .get();
+
+        if (userDoc.exists) {
+          return AppUser.fromFirestore(userDoc);
+        }
+      } catch (e) {
+        // Handle exceptions
+      }
+      return null;
+    }
+  }
+
+  Future<AppUser?> fetchUserDetails(String userId) async {
+    try {
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .get();
+
+      if (userDoc.exists) {
+        return AppUser.fromFirestore(userDoc);
+      }
+    } catch (e) {
+      // Handle exceptions
+      print(e); // Consider proper error handling
+    }
+    return null;
   }
 }

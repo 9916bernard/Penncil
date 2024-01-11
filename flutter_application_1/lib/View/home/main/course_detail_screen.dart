@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_application_1/View/home/chat/chatroom_page.dart';
 import 'package:flutter_application_1/models/course_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_application_1/models/user_model.dart';
+import 'package:flutter_application_1/providers/user_data_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_application_1/providers/course_provider.dart';
 
@@ -26,14 +29,13 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
   }
 
   Future<void> fetchCourseDetails() async {
-    DocumentSnapshot snapshot = await FirebaseFirestore.instance
-        .collection('courses')
-        .doc(widget.courseId)
-        .get();
+    Course? fetchedCourse =
+        await Provider.of<CourseProvider>(context, listen: false)
+            .fetchCourseDetails(widget.courseId);
 
-    if (snapshot.exists) {
+    if (fetchedCourse != null) {
       setState(() {
-        course = Course.fromFirestore(snapshot);
+        course = fetchedCourse;
         isEnrolled = course!.enrolledUsers.contains(_auth.currentUser?.uid);
       });
     }
@@ -82,32 +84,21 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
                       physics: NeverScrollableScrollPhysics(),
                       itemCount: course!.enrolledUsers.length,
                       itemBuilder: (context, index) {
-                        return FutureBuilder<DocumentSnapshot>(
-                          future: FirebaseFirestore.instance
-                              .collection('users')
-                              .doc(course!.enrolledUsers[index])
-                              .get(),
-                          builder: (context, userSnapshot) {
-                            if (userSnapshot.connectionState ==
+                        return FutureBuilder<AppUser?>(
+                          future: Provider.of<UserDataProvider>(context,
+                                  listen: false)
+                              .fetchUserDetails(course!.enrolledUsers[index]),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
                                     ConnectionState.done &&
-                                userSnapshot.data != null) {
-                              Map<String, dynamic> userData = userSnapshot.data!
-                                  .data() as Map<String, dynamic>;
-                              return Container(
-                                padding: EdgeInsets.symmetric(vertical: 10),
-                                child: Row(
-                                  children: [
-                                    CircleAvatar(
-                                      backgroundImage: NetworkImage(
-                                          userData['pickedImage'] ??
-                                              'default_user_image_url'),
-                                      radius: 20,
-                                    ),
-                                    SizedBox(width: 10),
-                                    Text(
-                                        userData['userName'] ?? 'Unknown User'),
-                                  ],
+                                snapshot.data != null) {
+                              AppUser user = snapshot.data!;
+                              return ListTile(
+                                leading: CircleAvatar(
+                                  backgroundImage:
+                                      NetworkImage(user.profileImageUrl),
                                 ),
+                                title: Text(user.userName),
                               );
                             } else {
                               return Center(child: CircularProgressIndicator());
@@ -116,6 +107,10 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
                         );
                       },
                     ),
+                    ElevatedButton(
+                      onPressed: () => joinCourseChat(),
+                      child: Text('Join Course Chat'),
+                    ),
                   ],
                 ),
               ),
@@ -123,10 +118,53 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
     );
   }
 
+  void joinCourseChat() async {
+    final currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser != null && course != null) {
+      // Check if a chatroom with the course name already exists
+      QuerySnapshot existingChatrooms = await FirebaseFirestore.instance
+          .collection('courseChats')
+          .where('name', isEqualTo: course!.name)
+          .limit(1)
+          .get();
+
+      if (existingChatrooms.docs.isNotEmpty) {
+        // Chatroom already exists, add user as a participant if not already
+        DocumentReference chatRoomRef = existingChatrooms.docs.first.reference;
+        await addParticipantToChatRoom(chatRoomRef, currentUser.uid);
+      } else {
+        // Create a new chatroom
+        DocumentReference newChatRoomRef =
+            await FirebaseFirestore.instance.collection('courseChats').add({
+          'name': course!.name,
+          'participants': [currentUser.uid],
+        });
+        await addParticipantToChatRoom(newChatRoomRef, currentUser.uid);
+      }
+    }
+  }
+
+  Future<void> addParticipantToChatRoom(
+      DocumentReference chatRoomRef, String userId) async {
+    await chatRoomRef.update({
+      'participants': FieldValue.arrayUnion([userId])
+    });
+
+    await FirebaseFirestore.instance.collection('users').doc(userId).update({
+      'joinedChatrooms': FieldValue.arrayUnion([chatRoomRef.id])
+    });
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => Chatroom(chatRoomId: chatRoomRef.id)),
+    );
+  }
+
   void enrollInCourse(CourseProvider provider) async {
     await provider.enrollInCourse(widget.courseId, _auth.currentUser!.uid);
     await fetchCourseDetails(); // Refetch course details to update the UI
-  }
+  } //프로바이더에 있는 함수가 작동하기까지 기다림
 
   void removeFromCourse(CourseProvider provider) async {
     await provider.removeFromCourse(widget.courseId, _auth.currentUser!.uid);
