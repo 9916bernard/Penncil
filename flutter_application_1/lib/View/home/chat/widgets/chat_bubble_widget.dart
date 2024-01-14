@@ -36,7 +36,9 @@ class ChatBubbles extends StatelessWidget {
           ChatBubble(
             clipper: ChatBubbleClipper8(type: BubbleType.sendBubble),
             alignment: Alignment.topRight,
-            margin: const EdgeInsets.only(bottom: 10),
+            margin: const EdgeInsets.only(
+              bottom: 10,
+            ),
             backGroundColor: Colors.blue,
             child: Container(
               constraints: BoxConstraints(
@@ -57,11 +59,17 @@ class ChatBubbles extends StatelessWidget {
         radius: 25,
         backgroundImage: userImage.isNotEmpty ? NetworkImage(userImage) : null,
       ),
+      const SizedBox(
+        width: 5,
+      ),
     ];
   }
 
   List<Widget> _buildOtherMessageLayout(BuildContext context) {
     return [
+      const SizedBox(
+        width: 5,
+      ),
       CircleAvatar(
         radius: 25,
         backgroundImage: userImage.isNotEmpty ? NetworkImage(userImage) : null,

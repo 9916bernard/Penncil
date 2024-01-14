@@ -1,63 +1,43 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_application_1/providers/user_data_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:flutter_application_1/View/home/chat/chatroom_page.dart';
+import 'package:flutter_application_1/providers/chatroom_provider.dart';
 
 class ChatScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final user = FirebaseAuth.instance.currentUser;
-
-    if (user == null) {
-      return Scaffold(
-        body: Center(child: Text("You need to be logged in to view chatrooms")),
-      );
-    }
+    final chatRoomProvider = Provider.of<ChatRoomProvider>(context);
+    final userDataProvider =
+        Provider.of<UserDataProvider>(context, listen: false);
+    final user = userDataProvider.user;
 
     return Scaffold(
-      body: StreamBuilder<DocumentSnapshot>(
-        stream: FirebaseFirestore.instance
-            .collection('users')
-            .doc(user.uid)
-            .snapshots(),
-        builder: (BuildContext context,
-            AsyncSnapshot<DocumentSnapshot> userSnapshot) {
-          if (userSnapshot.connectionState == ConnectionState.waiting) {
+      body: FutureBuilder<List<String>>(
+        future: chatRoomProvider.fetchUserChatRooms(user!.id),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
           }
 
-          if (!userSnapshot.hasData || !userSnapshot.data!.exists) {
-            return Center(child: Text("No Chatrooms available"));
-          }
-
-          // Safely access 'joinedChatrooms' field
-          var userData = userSnapshot.data!.data() as Map<String, dynamic>;
-          List<dynamic> joinedChatrooms =
-              userData.containsKey('joinedChatrooms')
-                  ? List.from(userData['joinedChatrooms'])
-                  : [];
-
-          if (joinedChatrooms.isEmpty) {
+          if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return Center(child: Text("No Chatrooms available"));
           }
 
           return ListView.builder(
-            itemCount: joinedChatrooms.length,
+            itemCount: snapshot.data!.length,
             itemBuilder: (context, index) {
-              return FutureBuilder<DocumentSnapshot>(
-                future: FirebaseFirestore.instance
-                    .collection('courseChats')
-                    .doc(joinedChatrooms[index])
-                    .get(),
-                builder: (context, chatSnapshot) {
-                  if (chatSnapshot.connectionState == ConnectionState.done &&
-                      chatSnapshot.hasData) {
-                    var chatRoom = chatSnapshot.data!;
-                    return _buildChatRoomItem(context, chatRoom.id,
-                        chatRoom.get('name') ?? 'Chatroom');
+              String chatRoomId = snapshot.data![index];
+              return FutureBuilder<String>(
+                future: chatRoomProvider.fetchChatRoomName(chatRoomId),
+                builder: (context, chatNameSnapshot) {
+                  if (chatNameSnapshot.connectionState ==
+                          ConnectionState.done &&
+                      chatNameSnapshot.hasData) {
+                    return _buildChatRoomItem(
+                        context, chatRoomId, chatNameSnapshot.data!);
                   } else {
-                    return SizedBox
-                        .shrink(); // Skip rendering if chatroom data is not available
+                    return SizedBox.shrink();
                   }
                 },
               );

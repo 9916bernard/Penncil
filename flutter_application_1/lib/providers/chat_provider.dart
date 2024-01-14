@@ -1,33 +1,42 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_application_1/models/chat_model.dart';
 
+//나중에 개인챗 할때는 프로바이더에다가 새로운 메소드 만들어서 쓰면 될듯? personalchats/어쩌구/message 이렇게
 class ChatProvider with ChangeNotifier {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  List<ChatMessage> _messages = [];
+  List<ChatModel> _messages = [];
 
-  List<ChatMessage> get messages => _messages;
+  List<ChatModel> get messages => _messages;
 
-  // Fetch chat messages
-  Future<void> fetchChatMessages(String chatRoomId) async {
-    QuerySnapshot snapshot = await _firestore
-        .collection('chats/$chatRoomId/message')
-        .orderBy('time', descending: true)
-        .get();
-    _messages =
-        snapshot.docs.map((doc) => ChatMessage.fromFirestore(doc)).toList();
-    notifyListeners();
+  Future<void> fetchMessages(String chatRoomId) async {
+    try {
+      QuerySnapshot snapshot = await _firestore
+          .collection('courseChats/$chatRoomId/message')
+          .orderBy('time', descending: true)
+          .get();
+
+      _messages =
+          snapshot.docs.map((doc) => ChatModel.fromFirestore(doc)).toList();
+      notifyListeners();
+    } catch (e) {
+      // Handle exceptions
+    }
   }
 
-  // Send a new message
-  Future<void> sendMessage(String chatRoomId, ChatMessage message) async {
-    await _firestore.collection('chats/$chatRoomId/message').add({
-      'text': message.text,
-      'time': Timestamp.fromDate(message.time),
-      'userId': message.userId,
-      'userName': message.userName,
-      'userImage': message.userImage,
-    });
-    notifyListeners();
+  Future<void> sendMessage(String chatRoomId, String text, String userId,
+      String userName, String userImage) async {
+    try {
+      await _firestore.collection('courseChats/$chatRoomId/message').add({
+        'text': text,
+        'userId': userId,
+        'userName': userName,
+        'userImage': userImage,
+        'time': Timestamp.now(),
+      });
+      fetchMessages(chatRoomId); // Refresh messages after sending
+    } catch (e) {
+      // Handle exceptions
+    }
   }
 }

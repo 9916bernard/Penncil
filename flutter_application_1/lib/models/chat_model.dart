@@ -1,28 +1,31 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class ChatMessage {
+class ChatModel {
+  final String id;
   final String text;
-  final DateTime time;
   final String userId;
   final String userName;
   final String userImage;
+  final DateTime time;
 
-  ChatMessage({
+  ChatModel({
+    required this.id,
     required this.text,
-    required this.time,
     required this.userId,
     required this.userName,
     required this.userImage,
+    required this.time,
   });
 
-  factory ChatMessage.fromFirestore(DocumentSnapshot doc) {
-    Map data = doc.data() as Map<String, dynamic>;
-    return ChatMessage(
+  factory ChatModel.fromFirestore(DocumentSnapshot doc) {
+    Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+    return ChatModel(
+      id: doc.id,
       text: data['text'] ?? '',
-      time: (data['time'] as Timestamp).toDate(),
       userId: data['userId'] ?? '',
       userName: data['userName'] ?? '',
       userImage: data['userImage'] ?? '',
+      time: (data['time'] as Timestamp).toDate(),
     );
   }
 }

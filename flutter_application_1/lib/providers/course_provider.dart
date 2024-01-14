@@ -73,4 +73,6 @@ class CourseProvider with ChangeNotifier {
 
     notifyListeners(); // Notify listeners to rebuild the UI if needed
   }
+
+  
 }

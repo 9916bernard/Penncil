@@ -4,6 +4,7 @@ import 'package:flutter_application_1/View/home/chat/chatroom_page.dart';
 import 'package:flutter_application_1/models/course_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_application_1/models/user_model.dart';
+import 'package:flutter_application_1/providers/chatroom_provider.dart';
 import 'package:flutter_application_1/providers/user_data_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_application_1/providers/course_provider.dart';
@@ -44,6 +45,8 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final courseProvider = Provider.of<CourseProvider>(context, listen: false);
+    final chatRoomProvider =
+        Provider.of<ChatRoomProvider>(context, listen: false);
 
     return Scaffold(
       appBar: AppBar(
@@ -108,7 +111,7 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
                       },
                     ),
                     ElevatedButton(
-                      onPressed: () => joinCourseChat(),
+                      onPressed: () => joinCourseChat(chatRoomProvider),
                       child: Text('Join Course Chat'),
                     ),
                   ],
@@ -118,29 +121,16 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
     );
   }
 
-  void joinCourseChat() async {
+  void joinCourseChat(ChatRoomProvider provider) async {
     final currentUser = FirebaseAuth.instance.currentUser;
     if (currentUser != null && course != null) {
-      // Check if a chatroom with the course name already exists
-      QuerySnapshot existingChatrooms = await FirebaseFirestore.instance
-          .collection('courseChats')
-          .where('name', isEqualTo: course!.name)
-          .limit(1)
-          .get();
-
-      if (existingChatrooms.docs.isNotEmpty) {
-        // Chatroom already exists, add user as a participant if not already
-        DocumentReference chatRoomRef = existingChatrooms.docs.first.reference;
-        await addParticipantToChatRoom(chatRoomRef, currentUser.uid);
-      } else {
-        // Create a new chatroom
-        DocumentReference newChatRoomRef =
-            await FirebaseFirestore.instance.collection('courseChats').add({
-          'name': course!.name,
-          'participants': [currentUser.uid],
-        });
-        await addParticipantToChatRoom(newChatRoomRef, currentUser.uid);
-      }
+      String chatRoomId =
+          await provider.joinOrCreateChatRoom(course!.name, currentUser.uid);
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => Chatroom(chatRoomId: chatRoomId)),
+      );
     }
   }
 

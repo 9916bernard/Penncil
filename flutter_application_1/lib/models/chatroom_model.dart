@@ -1,20 +1,18 @@
-//적용 안됨 미완
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class Chatroom {
+class ChatRoom {
   final String id;
   final String name;
   final List<String> participants;
 
-  Chatroom({required this.id, required this.name, required this.participants});
-
-  factory Chatroom.fromFirestore(DocumentSnapshot doc) {
-    Map data = doc.data() as Map<String, dynamic>;
-    return Chatroom(
+  ChatRoom({required this.id, required this.name, required this.participants});
+//여기선 가지고만 있고 하는건 provider에서
+  factory ChatRoom.fromFirestore(DocumentSnapshot doc) {
+    Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+    return ChatRoom(
       id: doc.id,
       name: data['name'] ?? '',
-      participants: List<String>.from(data['participants'] ?? []),
+      participants: List.from(data['participants'] ?? []),
     );
   }
 }

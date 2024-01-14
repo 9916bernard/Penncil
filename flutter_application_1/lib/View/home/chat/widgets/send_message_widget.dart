@@ -1,6 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
+import 'package:flutter_application_1/providers/chat_provider.dart';
+import 'package:flutter_application_1/providers/user_data_provider.dart';
 
 class SendMessageWidget extends StatefulWidget {
   final String chatRoomId;
@@ -16,25 +17,22 @@ class _SendMessageWidgetState extends State<SendMessageWidget> {
   final _controller = TextEditingController();
   var _enteredMessage = '';
 
-  void _sendMessage() async {
+  void _sendMessage() {
     FocusScope.of(context).unfocus();
-    final user = FirebaseAuth.instance.currentUser;
-    final userData = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(user!.uid)
-        .get();
+    final userDataProvider =
+        Provider.of<UserDataProvider>(context, listen: false);
+    final user = userDataProvider.user;
 
-    FirebaseFirestore.instance
-        .collection('courseChats/${widget.chatRoomId}/message')
-        .add({
-      'text': _enteredMessage,
-      'time': Timestamp.now(),
-      'userId': user.uid,
-      'userName': userData.data()!['userName'],
-      'userImage': userData['pickedImage'],
-    });
-
-    _controller.clear();
+    if (user != null && _enteredMessage.trim().isNotEmpty) {
+      Provider.of<ChatProvider>(context, listen: false).sendMessage(
+        widget.chatRoomId,
+        _enteredMessage,
+        user.id,
+        user.userName,
+        user.profileImageUrl,
+      );
+      _controller.clear();
+    }
   }
 
   @override
