@@ -89,7 +89,7 @@ class _MainScreenState extends State<MainScreen> {
                     ),
                   )
                 else
-                  Text("You are not enrolled in any courses."),
+                  Center(child: Text("You are not enrolled in any courses.")),
                 AddCourseWidget(),
               ],
             ),
