@@ -39,7 +39,7 @@ class _MainScreenState extends State<MainScreen> {
                         TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
                 if (user != null && user.enrolledCourses.isNotEmpty)
                   Container(
-                    height: MediaQuery.of(context).size.height * 0.8,
+                    height: MediaQuery.of(context).size.height,
                     child: ListView.builder(
                       itemCount: user.enrolledCourses.length,
                       itemBuilder: (context, index) {
@@ -67,7 +67,7 @@ class _MainScreenState extends State<MainScreen> {
                                       child: Card(
                                         color: Colors.white,
                                         child: Padding(
-                                          padding: const EdgeInsets.all(8.0),
+                                          padding: const EdgeInsets.all(5.0),
                                           child: Column(
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
@@ -79,7 +79,6 @@ class _MainScreenState extends State<MainScreen> {
                                                     fontWeight:
                                                         FontWeight.bold),
                                               ),
-                                              SizedBox(height: 10),
                                               Container(
                                                 height: 200,
                                                 width: double.infinity,
@@ -97,9 +96,9 @@ class _MainScreenState extends State<MainScreen> {
                                                   ),
                                                 ),
                                               ),
-                                              SizedBox(height: 20),
+                                              SizedBox(height: 10),
                                               Container(
-                                                height: 60,
+                                                height: 40,
                                                 child: Stack(
                                                   children: List.generate(
                                                     course.enrolledUsers.length,
