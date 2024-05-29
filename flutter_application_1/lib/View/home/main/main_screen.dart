@@ -16,7 +16,6 @@ class _MainScreenState extends State<MainScreen> {
   @override
   void initState() {
     super.initState();
-    // microtask는 main screen이 빌드될떄마다 실행됨
     Future.microtask(() =>
         Provider.of<UserDataProvider>(context, listen: false).fetchUserData());
   }
@@ -32,23 +31,19 @@ class _MainScreenState extends State<MainScreen> {
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                SizedBox(height: 20),
+                SizedBox(height: 10),
                 Text('Your Courses',
                     style:
-                        TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-                SizedBox(height: 10),
+                        TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
                 if (user != null && user.enrolledCourses.isNotEmpty)
                   Container(
-                    height: MediaQuery.of(context).size.height *
-                        0.5, // Adjust the size as per your need
+                    height: MediaQuery.of(context).size.height * 0.8,
                     child: ListView.builder(
-                      itemCount: user.enrolledCourses
-                          .length, // 유저의 enrolledCourses의 길이만큼 리스트뷰 생성
+                      itemCount: user.enrolledCourses.length,
                       itemBuilder: (context, index) {
                         return Consumer<CourseProvider>(
-                          // CourseProvider를 consumer로 감싸서 rebuild되게 함
                           builder: (context, courseProvider, child) {
                             return FutureBuilder<Course?>(
                               future: courseProvider.fetchCourseDetails(
@@ -58,20 +53,113 @@ class _MainScreenState extends State<MainScreen> {
                                     ConnectionState.done) {
                                   if (snapshot.data != null) {
                                     Course course = snapshot.data!;
-                                    return Card(
-                                      child: ListTile(
-                                        title: Text(course.name),
-                                        subtitle: Text(course.description),
-                                        onTap: () {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  CourseDetailScreen(
-                                                      courseId: course.id),
-                                            ),
-                                          );
-                                        },
+                                    return GestureDetector(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                CourseDetailScreen(
+                                                    courseId: course.id),
+                                          ),
+                                        );
+                                      },
+                                      child: Card(
+                                        color: Colors.white,
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                course.name,
+                                                style: TextStyle(
+                                                    fontSize: 18,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                              SizedBox(height: 10),
+                                              Container(
+                                                height: 200,
+                                                width: double.infinity,
+                                                decoration: BoxDecoration(
+                                                  color: Colors.grey[300],
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          16.0),
+                                                ),
+                                                child: Center(
+                                                  child: Text(
+                                                    'User-picked image goes here',
+                                                    style: TextStyle(
+                                                        color: Colors.grey),
+                                                  ),
+                                                ),
+                                              ),
+                                              SizedBox(height: 20),
+                                              Container(
+                                                height: 60,
+                                                child: Stack(
+                                                  children: List.generate(
+                                                    course.enrolledUsers.length,
+                                                    (index) {
+                                                      return Positioned(
+                                                        left: index * 30.0,
+                                                        child: FutureBuilder<
+                                                            DocumentSnapshot>(
+                                                          future: FirebaseFirestore
+                                                              .instance
+                                                              .collection(
+                                                                  'users')
+                                                              .doc(course
+                                                                      .enrolledUsers[
+                                                                  index])
+                                                              .get(),
+                                                          builder: (context,
+                                                              userSnapshot) {
+                                                            if (userSnapshot
+                                                                        .connectionState ==
+                                                                    ConnectionState
+                                                                        .done &&
+                                                                userSnapshot
+                                                                        .data !=
+                                                                    null) {
+                                                              Map<String,
+                                                                      dynamic>
+                                                                  userData =
+                                                                  userSnapshot
+                                                                          .data!
+                                                                          .data()
+                                                                      as Map<
+                                                                          String,
+                                                                          dynamic>;
+                                                              return CircleAvatar(
+                                                                backgroundImage:
+                                                                    NetworkImage(
+                                                                        userData['pickedImage'] ??
+                                                                            'default_user_image_url'),
+                                                                radius: 20,
+                                                              );
+                                                            } else {
+                                                              return CircleAvatar(
+                                                                backgroundColor:
+                                                                    Colors.grey,
+                                                                radius: 20,
+                                                                child:
+                                                                    CircularProgressIndicator(),
+                                                              );
+                                                            }
+                                                          },
+                                                        ),
+                                                      );
+                                                    },
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
                                       ),
                                     );
                                   } else {
@@ -89,7 +177,7 @@ class _MainScreenState extends State<MainScreen> {
                     ),
                   )
                 else
-                  Center(child: Text("You are not enrolled in any courses.")),
+                  Text("You are not enrolled in any courses."),
                 AddCourseWidget(),
               ],
             ),
