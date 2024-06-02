@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/View/global_widgets/add_course_widget.dart';
-import 'package:flutter_application_1/View/home/main/course_detail_screen.dart';
-import 'package:flutter_application_1/models/course_model.dart';
-import 'package:flutter_application_1/providers/course_provider.dart';
+import 'package:flutter_application_1/View/global_widgets/add_group_widget.dart'; // Rename this widget file
+import 'package:flutter_application_1/View/home/main/group_detail_screen.dart'; // Rename this screen file
+import 'package:flutter_application_1/models/group_model.dart';
+import 'package:flutter_application_1/providers/group_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_application_1/providers/user_data_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -34,33 +34,33 @@ class _MainScreenState extends State<MainScreen> {
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 SizedBox(height: 10),
-                Text('Your Courses',
+                Text('Your Groups',
                     style:
                         TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
-                if (user != null && user.enrolledCourses.isNotEmpty)
+                if (user != null && user.enrolledGroups.isNotEmpty)
                   Container(
                     height: MediaQuery.of(context).size.height,
                     child: ListView.builder(
-                      itemCount: user.enrolledCourses.length,
+                      itemCount: user.enrolledGroups.length,
                       itemBuilder: (context, index) {
-                        return Consumer<CourseProvider>(
-                          builder: (context, courseProvider, child) {
-                            return FutureBuilder<Course?>(
-                              future: courseProvider.fetchCourseDetails(
-                                  user.enrolledCourses[index]),
+                        return Consumer<GroupProvider>(
+                          builder: (context, groupProvider, child) {
+                            return FutureBuilder<Group?>(
+                              future: groupProvider.fetchGroupDetails(
+                                  user.enrolledGroups[index]),
                               builder: (context, snapshot) {
                                 if (snapshot.connectionState ==
                                     ConnectionState.done) {
                                   if (snapshot.data != null) {
-                                    Course course = snapshot.data!;
+                                    Group group = snapshot.data!;
                                     return GestureDetector(
                                       onTap: () {
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(
                                             builder: (context) =>
-                                                CourseDetailScreen(
-                                                    courseId: course.id),
+                                                GroupDetailScreen(
+                                                    groupId: group.id),
                                           ),
                                         );
                                       },
@@ -73,7 +73,7 @@ class _MainScreenState extends State<MainScreen> {
                                                 CrossAxisAlignment.start,
                                             children: [
                                               Text(
-                                                course.name,
+                                                group.name,
                                                 style: TextStyle(
                                                     fontSize: 18,
                                                     fontWeight:
@@ -101,7 +101,7 @@ class _MainScreenState extends State<MainScreen> {
                                                 height: 40,
                                                 child: Stack(
                                                   children: List.generate(
-                                                    course.enrolledUsers.length,
+                                                    group.enrolledUsers.length,
                                                     (index) {
                                                       return Positioned(
                                                         left: index * 30.0,
@@ -111,7 +111,7 @@ class _MainScreenState extends State<MainScreen> {
                                                               .instance
                                                               .collection(
                                                                   'users')
-                                                              .doc(course
+                                                              .doc(group
                                                                       .enrolledUsers[
                                                                   index])
                                                               .get(),
@@ -162,7 +162,7 @@ class _MainScreenState extends State<MainScreen> {
                                       ),
                                     );
                                   } else {
-                                    return Text('Course not found');
+                                    return Text('Group not found');
                                   }
                                 } else {
                                   return Center(
@@ -176,8 +176,8 @@ class _MainScreenState extends State<MainScreen> {
                     ),
                   )
                 else
-                  Text("You are not enrolled in any courses."),
-                AddCourseWidget(),
+                  Text("You are not enrolled in any groups."),
+                AddGroupWidget(), // Rename this widget
               ],
             ),
           ),

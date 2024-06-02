@@ -75,7 +75,7 @@ class ChatScreen extends StatelessWidget {
           );
         },
         child: Card(
-          color: Color.fromARGB(140, 55, 142, 213),
+          color: Color.fromARGB(139, 250, 250, 250),
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Row(
@@ -130,7 +130,7 @@ class ChatScreen extends StatelessWidget {
                           Text(
                             chatRoomName,
                             style: TextStyle(
-                              color: Colors.white,
+                              color: Colors.black,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -138,7 +138,7 @@ class ChatScreen extends StatelessWidget {
                           Text(
                             '${participants.length}',
                             style: TextStyle(
-                              color: Colors.white,
+                              color: Colors.black,
                             ),
                           ),
                         ],
@@ -146,7 +146,7 @@ class ChatScreen extends StatelessWidget {
                       Text(
                         lastMessage,
                         style: TextStyle(
-                          color: Colors.white,
+                          color: Colors.black,
                           fontSize: 12,
                         ),
                       ),
@@ -158,7 +158,7 @@ class ChatScreen extends StatelessWidget {
                     Text(
                       _formatTimestamp(timestamp),
                       style: TextStyle(
-                        color: Colors.white,
+                        color: Colors.black,
                         fontSize: 12,
                       ),
                     ),

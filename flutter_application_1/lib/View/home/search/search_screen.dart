@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/View/global_widgets/add_course_widget.dart';
-import 'package:flutter_application_1/View/home/main/course_detail_screen.dart';
-import 'package:flutter_application_1/models/course_model.dart';
+import 'package:flutter_application_1/View/global_widgets/add_group_widget.dart';
+import 'package:flutter_application_1/View/home/main/group_detail_screen.dart';
+import 'package:flutter_application_1/models/group_model.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_application_1/providers/course_provider.dart';
+import 'package:flutter_application_1/providers/group_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class SearchScreen extends StatefulWidget {
@@ -17,16 +17,16 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final courseProvider = Provider.of<CourseProvider>(context);
+    final groupProvider = Provider.of<GroupProvider>(context);
 
-    // Fetch courses when the screen is built
-    courseProvider.fetchCourses();
+    // Fetch groups when the screen is built
+    groupProvider.fetchGroups();
 
-    List<Course> displayedCourses = searchQuery.isEmpty
-        ? courseProvider.courses
-        : courseProvider.courses
-            .where((course) =>
-                course.name.toLowerCase().contains(searchQuery.toLowerCase()))
+    List<Group> displayedGroups = searchQuery.isEmpty
+        ? groupProvider.groups
+        : groupProvider.groups
+            .where((group) =>
+                group.name.toLowerCase().contains(searchQuery.toLowerCase()))
             .toList();
 
     return Scaffold(
@@ -41,7 +41,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 });
               },
               decoration: InputDecoration(
-                labelText: "Search for courses",
+                labelText: "Search for groups",
                 border: OutlineInputBorder(),
                 suffixIcon: Icon(Icons.search),
               ),
@@ -49,16 +49,16 @@ class _SearchScreenState extends State<SearchScreen> {
           ),
           Expanded(
             child: ListView.builder(
-              itemCount: displayedCourses.length,
+              itemCount: displayedGroups.length,
               itemBuilder: (context, index) {
-                final course = displayedCourses[index];
+                final group = displayedGroups[index];
                 return GestureDetector(
                   onTap: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) =>
-                            CourseDetailScreen(courseId: course.id),
+                            GroupDetailScreen(groupId: group.id),
                       ),
                     );
                   },
@@ -70,7 +70,7 @@ class _SearchScreenState extends State<SearchScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            course.name,
+                            group.name,
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
@@ -95,9 +95,9 @@ class _SearchScreenState extends State<SearchScreen> {
                             height: 40,
                             child: Stack(
                               children: List.generate(
-                                course.enrolledUsers.length,
+                                group.enrolledUsers.length,
                                 (index) {
-                                  String userId = course.enrolledUsers[index];
+                                  String userId = group.enrolledUsers[index];
                                   if (!userCache.containsKey(userId)) {
                                     userCache[userId] =
                                         {}; // Initialize with an empty map
@@ -142,7 +142,7 @@ class _SearchScreenState extends State<SearchScreen> {
               },
             ),
           ),
-          AddCourseWidget(),
+          AddGroupWidget(),
         ],
       ),
     );

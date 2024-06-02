@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_application_1/models/chat_model.dart';
 
-//나중에 개인챗 할때는 프로바이더에다가 새로운 메소드 만들어서 쓰면 될듯? personalchats/어쩌구/message 이렇게
 class ChatProvider with ChangeNotifier {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   List<ChatModel> _messages = [];
@@ -12,7 +11,7 @@ class ChatProvider with ChangeNotifier {
   Future<void> fetchMessages(String chatRoomId) async {
     try {
       QuerySnapshot snapshot = await _firestore
-          .collection('courseChats/$chatRoomId/message')
+          .collection('groupChats/$chatRoomId/message')
           .orderBy('time', descending: true)
           .get();
 
@@ -27,7 +26,7 @@ class ChatProvider with ChangeNotifier {
   Future<void> sendMessage(String chatRoomId, String text, String userId,
       String userName, String userImage) async {
     try {
-      await _firestore.collection('courseChats/$chatRoomId/message').add({
+      await _firestore.collection('groupChats/$chatRoomId/message').add({
         'text': text,
         'userId': userId,
         'userName': userName,

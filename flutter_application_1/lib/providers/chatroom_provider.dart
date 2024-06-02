@@ -11,7 +11,7 @@ class ChatRoomProvider with ChangeNotifier {
   Future<void> fetchChatRooms() async {
     try {
       QuerySnapshot querySnapshot =
-          await _firestore.collection('courseChats').get();
+          await _firestore.collection('groupChats').get();
       _chatRooms =
           querySnapshot.docs.map((doc) => ChatRoom.fromFirestore(doc)).toList();
       notifyListeners();
@@ -23,7 +23,7 @@ class ChatRoomProvider with ChangeNotifier {
   Future<String> joinOrCreateChatRoom(
       String chatRoomName, String userId) async {
     QuerySnapshot existingChatRooms = await _firestore
-        .collection('courseChats')
+        .collection('groupChats')
         .where('name', isEqualTo: chatRoomName)
         .limit(1)
         .get();
@@ -34,7 +34,7 @@ class ChatRoomProvider with ChangeNotifier {
       return chatRoomRef.id;
     } else {
       DocumentReference newChatRoomRef =
-          await _firestore.collection('courseChats').add({
+          await _firestore.collection('groupChats').add({
         'name': chatRoomName,
         'participants': [userId],
       });
@@ -54,7 +54,7 @@ class ChatRoomProvider with ChangeNotifier {
 
     try {
       QuerySnapshot querySnapshot = await _firestore
-          .collection('courseChats')
+          .collection('groupChats')
           .where('participants', arrayContains: userId)
           .get();
 
@@ -71,7 +71,7 @@ class ChatRoomProvider with ChangeNotifier {
   Future<String> fetchChatRoomName(String chatRoomId) async {
     try {
       DocumentSnapshot docSnapshot =
-          await _firestore.collection('courseChats').doc(chatRoomId).get();
+          await _firestore.collection('groupChats').doc(chatRoomId).get();
       if (docSnapshot.exists) {
         return docSnapshot.get('name') as String;
       }
@@ -84,7 +84,7 @@ class ChatRoomProvider with ChangeNotifier {
   Future<Map<String, dynamic>> fetchChatRoomDetails(String chatRoomId) async {
     try {
       DocumentSnapshot chatRoomSnapshot =
-          await _firestore.collection('courseChats').doc(chatRoomId).get();
+          await _firestore.collection('groupChats').doc(chatRoomId).get();
       Map<String, dynamic>? chatRoomData =
           chatRoomSnapshot.data() as Map<String, dynamic>?;
 
