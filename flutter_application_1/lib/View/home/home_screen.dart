@@ -1,9 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/View/home/chat/chat_screen.dart';
-import 'package:flutter_application_1/View/home/main/main_screen.dart';
 import 'package:flutter_application_1/View/home/profile/profile_screen.dart';
-import 'package:flutter_application_1/View/home/search_screen.dart';
+import 'package:flutter_application_1/View/home/search/search_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -34,12 +33,10 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  int _selectedIndex =
-      0; // The default selected index for the BottomNavigationBar
+  int _selectedIndex = 0; // The default selected index for the BottomNavigationBar
 
   // Pages that correspond to the tabs in the BottomNavigationBar
   final List<Widget> _pages = <Widget>[
-    MainScreen(),
     SearchScreen(),
     ChatScreen(), // Chat screen
     ProfileScreen(), // Profile screen
@@ -58,14 +55,9 @@ class _HomeScreenState extends State<HomeScreen> {
         title: Text('Penncil'),
         automaticallyImplyLeading: false,
       ),
-      body: _pages[
-          _selectedIndex], // Display the page selected by the bottom navigation bar
+      body: _pages[_selectedIndex], // Display the page selected by the bottom navigation bar
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
           BottomNavigationBarItem(
             icon: Icon(Icons.search),
             label: 'Search',
@@ -81,8 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
         currentIndex: _selectedIndex,
         selectedItemColor: Colors.deepPurple[800],
-        unselectedItemColor: Colors
-            .grey[600], // Adjust unselected item color for better visibility
+        unselectedItemColor: Colors.grey[600], // Adjust unselected item color for better visibility
         onTap: _onItemTapped,
       ),
     );

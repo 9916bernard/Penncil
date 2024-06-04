@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter_application_1/View/global_widgets/add_course_widget.dart';
+import 'package:flutter_application_1/View/global_widgets/add_group_widget.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_application_1/View/login/login_screen.dart';
 import 'package:provider/provider.dart';
@@ -102,7 +102,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: Text('Change Username'),
               ),
             ),
-            AddCourseWidget(),
+            AddGroupWidget(),
           ],
         ),
       ),

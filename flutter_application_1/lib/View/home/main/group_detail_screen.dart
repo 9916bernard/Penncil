@@ -1,58 +1,58 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_application_1/View/home/chat/chatroom_page.dart';
-import 'package:flutter_application_1/models/course_model.dart';
+import 'package:flutter_application_1/models/group_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_application_1/models/user_model.dart';
 import 'package:flutter_application_1/providers/chatroom_provider.dart';
 import 'package:flutter_application_1/providers/user_data_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_application_1/providers/course_provider.dart';
+import 'package:flutter_application_1/providers/group_provider.dart';
 
-class CourseDetailScreen extends StatefulWidget {
-  final String courseId;
+class GroupDetailScreen extends StatefulWidget {
+  final String groupId;
 
-  CourseDetailScreen({required this.courseId});
+  GroupDetailScreen({required this.groupId});
 
   @override
-  _CourseDetailScreenState createState() => _CourseDetailScreenState();
+  _GroupDetailScreenState createState() => _GroupDetailScreenState();
 }
 
-class _CourseDetailScreenState extends State<CourseDetailScreen> {
+class _GroupDetailScreenState extends State<GroupDetailScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   bool isEnrolled = false;
-  Course? course;
+  Group? group;
 
   @override
   void initState() {
     super.initState();
-    fetchCourseDetails();
+    fetchGroupDetails();
   }
 
-  Future<void> fetchCourseDetails() async {
-    Course? fetchedCourse =
-        await Provider.of<CourseProvider>(context, listen: false)
-            .fetchCourseDetails(widget.courseId);
+  Future<void> fetchGroupDetails() async {
+    Group? fetchedGroup =
+        await Provider.of<GroupProvider>(context, listen: false)
+            .fetchGroupDetails(widget.groupId);
 
-    if (fetchedCourse != null) {
+    if (fetchedGroup != null) {
       setState(() {
-        course = fetchedCourse;
-        isEnrolled = course!.enrolledUsers.contains(_auth.currentUser?.uid);
+        group = fetchedGroup;
+        isEnrolled = group!.enrolledUsers.contains(_auth.currentUser?.uid);
       });
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final courseProvider = Provider.of<CourseProvider>(context, listen: false);
+    final groupProvider = Provider.of<GroupProvider>(context, listen: false);
     final chatRoomProvider =
         Provider.of<ChatRoomProvider>(context, listen: false);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Course Details'),
+        title: Text('Group Details'),
       ),
-      body: course == null
+      body: group == null
           ? Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
               child: Padding(
@@ -63,21 +63,21 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(course!.name,
+                        Text(group!.name,
                             style: TextStyle(
                                 fontSize: 24, fontWeight: FontWeight.bold)),
                         TextButton(
                           onPressed: () => isEnrolled
-                              ? removeFromCourse(courseProvider)
-                              : enrollInCourse(courseProvider),
+                              ? removeFromGroup(groupProvider)
+                              : enrollInGroup(groupProvider),
                           child: Text(isEnrolled
-                              ? 'Remove from Course'
+                              ? 'Remove from Group'
                               : 'Mark as Enrolled'),
                         ),
                       ],
                     ),
                     SizedBox(height: 10),
-                    Text(course!.description, style: TextStyle(fontSize: 18)),
+                    Text(group!.description, style: TextStyle(fontSize: 18)),
                     SizedBox(height: 20),
                     Text('Enrolled Students',
                         style: TextStyle(
@@ -85,12 +85,12 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
                     ListView.builder(
                       shrinkWrap: true,
                       physics: NeverScrollableScrollPhysics(),
-                      itemCount: course!.enrolledUsers.length,
+                      itemCount: group!.enrolledUsers.length,
                       itemBuilder: (context, index) {
                         return FutureBuilder<AppUser?>(
                           future: Provider.of<UserDataProvider>(context,
                                   listen: false)
-                              .fetchUserDetails(course!.enrolledUsers[index]),
+                              .fetchUserDetails(group!.enrolledUsers[index]),
                           builder: (context, snapshot) {
                             if (snapshot.connectionState ==
                                     ConnectionState.done &&
@@ -111,8 +111,8 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
                       },
                     ),
                     ElevatedButton(
-                      onPressed: () => joinCourseChat(chatRoomProvider),
-                      child: Text('Join Course Chat'),
+                      onPressed: () => joinGroupChat(chatRoomProvider),
+                      child: Text('Join Group Chat'),
                     ),
                   ],
                 ),
@@ -121,11 +121,11 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
     );
   }
 
-  void joinCourseChat(ChatRoomProvider provider) async {
+  void joinGroupChat(ChatRoomProvider provider) async {
     final currentUser = FirebaseAuth.instance.currentUser;
-    if (currentUser != null && course != null) {
+    if (currentUser != null && group != null) {
       String chatRoomId =
-          await provider.joinOrCreateChatRoom(course!.name, currentUser.uid);
+          await provider.joinOrCreateChatRoom(group!.name, currentUser.uid);
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -151,13 +151,13 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
     );
   }
 
-  void enrollInCourse(CourseProvider provider) async {
-    await provider.enrollInCourse(widget.courseId, _auth.currentUser!.uid);
-    await fetchCourseDetails(); // Refetch course details to update the UI
-  } //프로바이더에 있는 함수가 작동하기까지 기다림
+  void enrollInGroup(GroupProvider provider) async {
+    await provider.enrollInGroup(widget.groupId, _auth.currentUser!.uid);
+    await fetchGroupDetails(); // Refetch group details to update the UI
+  }
 
-  void removeFromCourse(CourseProvider provider) async {
-    await provider.removeFromCourse(widget.courseId, _auth.currentUser!.uid);
-    await fetchCourseDetails(); // Refetch course details to update the UI
+  void removeFromGroup(GroupProvider provider) async {
+    await provider.removeFromGroup(widget.groupId, _auth.currentUser!.uid);
+    await fetchGroupDetails(); // Refetch group details to update the UI
   }
 }
