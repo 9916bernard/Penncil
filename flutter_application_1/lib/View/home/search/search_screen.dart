@@ -83,12 +83,15 @@ class _SearchScreenState extends State<SearchScreen> {
                               color: Colors.grey[300],
                               borderRadius: BorderRadius.circular(16.0),
                             ),
-                            child: Center(
-                              child: Text(
-                                'User-picked image goes here',
-                                style: TextStyle(color: Colors.grey),
-                              ),
-                            ),
+                            child: group.imageUrl.isNotEmpty
+                                ? Image.network(
+                                    group.imageUrl,
+                                    fit: BoxFit.cover,
+                                  )
+                                : Image.asset(
+                                    'assets/default_${group.category.toLowerCase()}.png',
+                                    fit: BoxFit.cover,
+                                  ),
                           ),
                           SizedBox(height: 10),
                           Container(
