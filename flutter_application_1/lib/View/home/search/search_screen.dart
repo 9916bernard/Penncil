@@ -27,6 +27,14 @@ class _SearchScreenState extends State<SearchScreen> {
     "Game": ["All", "Board Games", "Video Games", "Card Games"]
   };
 
+  final Map<String, IconData> categoryIcons = {
+    "Sports": Icons.sports_soccer,
+    "Study": Icons.school,
+    "Hangout": Icons.local_cafe,
+    "Travel": Icons.airplanemode_active,
+    "Game": Icons.videogame_asset,
+  };
+
   @override
   void initState() {
     super.initState();
@@ -128,12 +136,30 @@ class _SearchScreenState extends State<SearchScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            group.name,
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                group.name,
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Row(
+                                children: [
+                                  Icon(categoryIcons[group.category] ?? Icons.category, color: Colors.grey),
+                                  SizedBox(width: 4),
+                                  Text(
+                                    group.category,
+                                    style: TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
                           ),
                           Container(
                             height: 200,

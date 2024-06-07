@@ -9,13 +9,16 @@ class ChatScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final chatRoomProvider = Provider.of<ChatRoomProvider>(context);
-    final userDataProvider =
-        Provider.of<UserDataProvider>(context, listen: false);
+    final userDataProvider = Provider.of<UserDataProvider>(context);
     final user = userDataProvider.user;
+
+    if (user == null) {
+      return Center(child: CircularProgressIndicator());
+    }
 
     return Scaffold(
       body: FutureBuilder<List<String>>(
-        future: chatRoomProvider.fetchUserChatRooms(user!.id),
+        future: chatRoomProvider.fetchUserChatRooms(user.id),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());

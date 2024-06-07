@@ -52,7 +52,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Penncil'),
+        title: Text('DoItWithMe'),
         automaticallyImplyLeading: false,
       ),
       body: _pages[_selectedIndex], // Display the page selected by the bottom navigation bar

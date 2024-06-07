@@ -72,7 +72,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                               : enrollInGroup(groupProvider),
                           child: Text(isEnrolled
                               ? 'Remove from Group'
-                              : 'Mark as Enrolled'),
+                              : 'Join Group'),
                         ),
                       ],
                     ),
@@ -111,7 +111,15 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                       },
                     ),
                     ElevatedButton(
-                      onPressed: () => joinGroupChat(chatRoomProvider),
+                      onPressed: group!.currentMembers >= group!.groupLimit
+                          ? () {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Group is full'),
+                                ),
+                              );
+                            }
+                          : () => joinGroupChat(chatRoomProvider),
                       child: Text('Join Group Chat'),
                     ),
                   ],
@@ -134,24 +142,15 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
     }
   }
 
-  Future<void> addParticipantToChatRoom(
-      DocumentReference chatRoomRef, String userId) async {
-    await chatRoomRef.update({
-      'participants': FieldValue.arrayUnion([userId])
-    });
-
-    await FirebaseFirestore.instance.collection('users').doc(userId).update({
-      'joinedChatrooms': FieldValue.arrayUnion([chatRoomRef.id])
-    });
-
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-          builder: (context) => Chatroom(chatRoomId: chatRoomRef.id)),
-    );
-  }
-
   void enrollInGroup(GroupProvider provider) async {
+    if (group!.currentMembers >= group!.groupLimit) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Group is full'),
+        ),
+      );
+      return;
+    }
     await provider.enrollInGroup(widget.groupId, _auth.currentUser!.uid);
     await fetchGroupDetails(); // Refetch group details to update the UI
   }

@@ -49,7 +49,8 @@ class GroupProvider with ChangeNotifier {
         .collection('groups')
         .doc(groupId)
         .update({
-      'enrolledUsers': FieldValue.arrayUnion([userId])
+      'enrolledUsers': FieldValue.arrayUnion([userId]),
+      'currentMembers': FieldValue.increment(1)
     });
 
     await FirebaseFirestore.instance.collection('users').doc(userId).update({
@@ -64,7 +65,8 @@ class GroupProvider with ChangeNotifier {
         .collection('groups')
         .doc(groupId)
         .update({
-      'enrolledUsers': FieldValue.arrayRemove([userId])
+      'enrolledUsers': FieldValue.arrayRemove([userId]),
+      'currentMembers': FieldValue.increment(-1)
     });
 
     await FirebaseFirestore.instance.collection('users').doc(userId).update({

@@ -18,6 +18,8 @@ class _AddGroupScreenState extends State<AddGroupScreen> {
   final TextEditingController _groupDescriptionController = TextEditingController();
   final TextEditingController _customCategoryController = TextEditingController();
   final TextEditingController _customSubcategoryController = TextEditingController();
+  final TextEditingController _groupLimitController = TextEditingController();
+  final TextEditingController _groupDurationController = TextEditingController();
   final ImagePicker _picker = ImagePicker();
   File? _groupImage;
 
@@ -78,6 +80,8 @@ class _AddGroupScreenState extends State<AddGroupScreen> {
       final String subcategory = _isCustomSubcategory
           ? _customSubcategoryController.text
           : _selectedSubcategory;
+      final int groupLimit = int.tryParse(_groupLimitController.text) ?? 10;
+      final int groupDuration = int.tryParse(_groupDurationController.text) ?? 24;
 
       if (groupName.isNotEmpty &&
           groupDescription.isNotEmpty &&
@@ -89,6 +93,10 @@ class _AddGroupScreenState extends State<AddGroupScreen> {
           imageUrl = await _uploadImage(_groupImage!);
         }
 
+        final Timestamp expiryTime = Timestamp.fromDate(
+          DateTime.now().add(Duration(hours: groupDuration)),
+        );
+
         // Create a new group document in the 'groups' collection
         DocumentReference group = await FirebaseFirestore.instance.collection('groups').add({
           'name': groupName,
@@ -96,7 +104,10 @@ class _AddGroupScreenState extends State<AddGroupScreen> {
           'category': category,
           'subcategory': subcategory,
           'imageUrl': imageUrl ?? '', // Save empty string if no image is uploaded
-          'enrolledUsers': [user.id] // Initially enroll the current user
+          'enrolledUsers': [user.id], // Initially enroll the current user
+          'groupLimit': groupLimit,
+          'currentMembers': 1,
+          'expiryTime': expiryTime, // Add expiry time
         });
 
         // Add the group to the user's 'enrolledGroups'
@@ -112,6 +123,8 @@ class _AddGroupScreenState extends State<AddGroupScreen> {
         _groupDescriptionController.clear();
         _customCategoryController.clear();
         _customSubcategoryController.clear();
+        _groupLimitController.clear();
+        _groupDurationController.clear();
 
         // Navigate back
         Navigator.of(context).pop();
@@ -127,6 +140,30 @@ class _AddGroupScreenState extends State<AddGroupScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Text(
+              'Group Image',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 10),
+            Center(
+              child: GestureDetector(
+                onTap: _pickImage,
+                child: CircleAvatar(
+                  radius: 50,
+                  backgroundImage: _groupImage != null
+                      ? FileImage(_groupImage!)
+                      : AssetImage('assets/default_${_selectedCategory.toLowerCase()}.png') as ImageProvider,
+                  child: _groupImage == null
+                      ? Icon(
+                          Icons.add_a_photo,
+                          size: 50,
+                          color: Colors.white,
+                        )
+                      : null,
+                ),
+              ),
+            ),
+            SizedBox(height: 20),
             TextField(
               controller: _groupNameController,
               decoration: InputDecoration(hintText: 'Group Name'),
@@ -134,6 +171,16 @@ class _AddGroupScreenState extends State<AddGroupScreen> {
             TextField(
               controller: _groupDescriptionController,
               decoration: InputDecoration(hintText: 'Group Description'),
+            ),
+            TextField(
+              controller: _groupLimitController,
+              decoration: InputDecoration(hintText: 'Group Limit'),
+              keyboardType: TextInputType.number,
+            ),
+            TextField(
+              controller: _groupDurationController,
+              decoration: InputDecoration(hintText: 'Group Duration (hours)'),
+              keyboardType: TextInputType.number,
             ),
             SizedBox(height: 20),
             Text(
@@ -189,30 +236,6 @@ class _AddGroupScreenState extends State<AddGroupScreen> {
                 controller: _customSubcategoryController,
                 decoration: InputDecoration(hintText: 'Enter custom subcategory'),
               ),
-            SizedBox(height: 20),
-            Text(
-              'Group Image',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 10),
-            Center(
-              child: GestureDetector(
-                onTap: _pickImage,
-                child: CircleAvatar(
-                  radius: 50,
-                  backgroundImage: _groupImage != null
-                      ? FileImage(_groupImage!)
-                      : AssetImage('assets/default_${_selectedCategory.toLowerCase()}.png') as ImageProvider,
-                  child: _groupImage == null
-                      ? Icon(
-                          Icons.add_a_photo,
-                          size: 50,
-                          color: Colors.white,
-                        )
-                      : null,
-                ),
-              ),
-            ),
             Spacer(),
             SizedBox(
               width: double.infinity,
