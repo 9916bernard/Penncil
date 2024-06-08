@@ -13,7 +13,33 @@ class SearchScreen extends StatefulWidget {
 
 class _SearchScreenState extends State<SearchScreen> {
   String searchQuery = "";
+  String selectedCategory = "All";
+  String selectedSubcategory = "All";
   Map<String, Map<String, dynamic>> userCache = {};
+
+  final List<String> categories = ["All", "Sports", "Study", "Hangout", "Travel", "Game"];
+  final Map<String, List<String>> subcategories = {
+    "All": ["All"],
+    "Sports": ["All", "Soccer", "Basketball", "Workout"],
+    "Study": ["All", "Math", "Science", "History"],
+    "Hangout": ["All", "Cafe", "Park", "Movie"],
+    "Travel": ["All", "Adventure", "Cultural", "Leisure"],
+    "Game": ["All", "Board Games", "Video Games", "Card Games"]
+  };
+
+  final Map<String, IconData> categoryIcons = {
+    "Sports": Icons.sports_soccer,
+    "Study": Icons.school,
+    "Hangout": Icons.local_cafe,
+    "Travel": Icons.airplanemode_active,
+    "Game": Icons.videogame_asset,
+  };
+
+  @override
+  void initState() {
+    super.initState();
+    selectedSubcategory = subcategories[selectedCategory]?.first ?? "All";
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,12 +48,12 @@ class _SearchScreenState extends State<SearchScreen> {
     // Fetch groups when the screen is built
     groupProvider.fetchGroups();
 
-    List<Group> displayedGroups = searchQuery.isEmpty
-        ? groupProvider.groups
-        : groupProvider.groups
-            .where((group) =>
-                group.name.toLowerCase().contains(searchQuery.toLowerCase()))
-            .toList();
+    List<Group> displayedGroups = groupProvider.groups.where((group) {
+      bool matchesCategory = selectedCategory == "All" || group.category == selectedCategory;
+      bool matchesSubcategory = selectedSubcategory == "All" || group.subcategory == selectedSubcategory;
+      bool matchesSearchQuery = group.name.toLowerCase().contains(searchQuery.toLowerCase());
+      return matchesCategory && matchesSubcategory && matchesSearchQuery;
+    }).toList();
 
     return Scaffold(
       body: Column(
@@ -45,6 +71,47 @@ class _SearchScreenState extends State<SearchScreen> {
                 border: OutlineInputBorder(),
                 suffixIcon: Icon(Icons.search),
               ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: DropdownButton<String>(
+                    value: selectedCategory,
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        selectedCategory = newValue!;
+                        selectedSubcategory = subcategories[selectedCategory]?.first ?? "All";
+                      });
+                    },
+                    items: categories.map<DropdownMenuItem<String>>((String category) {
+                      return DropdownMenuItem<String>(
+                        value: category,
+                        child: Text(category),
+                      );
+                    }).toList(),
+                  ),
+                ),
+                SizedBox(width: 10),
+                Expanded(
+                  child: DropdownButton<String>(
+                    value: selectedSubcategory,
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        selectedSubcategory = newValue!;
+                      });
+                    },
+                    items: (subcategories[selectedCategory] ?? ["All"]).map<DropdownMenuItem<String>>((String subcategory) {
+                      return DropdownMenuItem<String>(
+                        value: subcategory,
+                        child: Text(subcategory),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ],
             ),
           ),
           Expanded(
@@ -69,12 +136,30 @@ class _SearchScreenState extends State<SearchScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            group.name,
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                group.name,
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Row(
+                                children: [
+                                  Icon(categoryIcons[group.category] ?? Icons.category, color: Colors.grey),
+                                  SizedBox(width: 4),
+                                  Text(
+                                    group.category,
+                                    style: TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
                           ),
                           Container(
                             height: 200,
@@ -83,12 +168,15 @@ class _SearchScreenState extends State<SearchScreen> {
                               color: Colors.grey[300],
                               borderRadius: BorderRadius.circular(16.0),
                             ),
-                            child: Center(
-                              child: Text(
-                                'User-picked image goes here',
-                                style: TextStyle(color: Colors.grey),
-                              ),
-                            ),
+                            child: group.imageUrl.isNotEmpty
+                                ? Image.network(
+                                    group.imageUrl,
+                                    fit: BoxFit.cover,
+                                  )
+                                : Image.asset(
+                                    'assets/default_${group.category.toLowerCase()}.png',
+                                    fit: BoxFit.cover,
+                                  ),
                           ),
                           SizedBox(height: 10),
                           Container(
