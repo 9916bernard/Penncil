@@ -49,6 +49,19 @@ class ChatRoomProvider with ChangeNotifier {
     });
   }
 
+  // Exit Chat 추가 이수찬
+  Future<void> removeParticipantFromChatRoom(
+      String chatRoomId, String userId) async {
+    try {
+      await _firestore.collection('groupChats').doc(chatRoomId).update({
+        'participants': FieldValue.arrayRemove([userId])
+      });
+      notifyListeners();
+    } catch (e) {
+      // Handle exceptions
+    }
+  }
+
   Future<List<String>> fetchUserChatRooms(String userId) async {
     List<String> userChatRooms = [];
 
