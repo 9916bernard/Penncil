@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_bubble/chat_bubble.dart';
-import 'package:flutter_chat_bubble/bubble_type.dart';
-import 'package:flutter_chat_bubble/clippers/chat_bubble_clipper_8.dart';
 
 class ChatBubbles extends StatelessWidget {
-  const ChatBubbles(this.message, this.isMe, this.userName, this.userImage, {Key? key}) : super(key: key);
+  const ChatBubbles(this.message, this.isMe, this.userName, this.userImage,
+      {Key? key})
+      : super(key: key);
 
   final String message;
   final String userName;
@@ -15,7 +15,9 @@ class ChatBubbles extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
-      children: isMe ? _buildMyMessageLayout(context) : _buildOtherMessageLayout(context),
+      children: isMe
+          ? _buildMyMessageLayout(context)
+          : _buildOtherMessageLayout(context),
     );
   }
 
@@ -34,7 +36,9 @@ class ChatBubbles extends StatelessWidget {
           ChatBubble(
             clipper: ChatBubbleClipper8(type: BubbleType.sendBubble),
             alignment: Alignment.topRight,
-            margin: const EdgeInsets.only(bottom: 10),
+            margin: const EdgeInsets.only(
+              bottom: 10,
+            ),
             backGroundColor: Colors.blue,
             child: Container(
               constraints: BoxConstraints(
@@ -48,25 +52,31 @@ class ChatBubbles extends StatelessWidget {
           ),
         ],
       ),
-
-      const SizedBox(width: 5,),
-      
+      const SizedBox(
+        width: 5,
+      ),
       CircleAvatar(
         radius: 25,
         backgroundImage: userImage.isNotEmpty ? NetworkImage(userImage) : null,
+      ),
+      const SizedBox(
+        width: 5,
       ),
     ];
   }
 
   List<Widget> _buildOtherMessageLayout(BuildContext context) {
     return [
+      const SizedBox(
+        width: 5,
+      ),
       CircleAvatar(
         radius: 25,
         backgroundImage: userImage.isNotEmpty ? NetworkImage(userImage) : null,
       ),
-
-      const SizedBox(width: 5,),
-
+      const SizedBox(
+        width: 5,
+      ),
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

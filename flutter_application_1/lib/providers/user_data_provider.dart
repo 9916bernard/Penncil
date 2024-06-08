@@ -15,14 +15,22 @@ class UserDataProvider with ChangeNotifier {
   AppUser? get user => _user;
 
   UserDataProvider() {
-    fetchUserData();
+    _auth.authStateChanges().listen((User? user) {
+      if (user == null) {
+        _user = null; // Clear user data when signed out
+      } else {
+        fetchUserData(); // Fetch new user data when signed in
+      }
+      notifyListeners();
+    });
   }
 
   Future<void> fetchUserData() async {
     final firebaseUser = _auth.currentUser;
     if (firebaseUser != null) {
       try {
-        DocumentSnapshot userDoc = await _firestore.collection('users').doc(firebaseUser.uid).get();
+        DocumentSnapshot userDoc =
+            await _firestore.collection('users').doc(firebaseUser.uid).get();
         _user = AppUser.fromFirestore(userDoc); // Use your custom AppUser model
         notifyListeners();
       } catch (e) {
@@ -39,11 +47,13 @@ class UserDataProvider with ChangeNotifier {
           'userName': newUserName,
         });
         if (_user != null) {
-          _user = AppUser( // Use your custom AppUser model
+          _user = AppUser(
+            // Use your custom AppUser model
             id: _user!.id,
             userName: newUserName,
             email: _user!.email,
             profileImageUrl: _user!.profileImageUrl,
+            enrolledGroups: _user!.enrolledGroups,
           );
           notifyListeners();
         }
@@ -54,27 +64,77 @@ class UserDataProvider with ChangeNotifier {
   }
 
   Future<void> uploadProfilePicture(File newImage) async {
-  final user = FirebaseAuth.instance.currentUser;
-  if (user != null) {
-    try {
-      final ref = FirebaseStorage.instance.ref().child('user_images').child(user.uid + '.jpg');
-      await ref.putFile(newImage);
-      final url = await ref.getDownloadURL();
-      await user.updateProfile(photoURL: url);
-      await FirebaseFirestore.instance.collection('users').doc(user.uid).update({
-        'pickedImage': url,
-      });
-      _user = AppUser(
-        id: _user!.id,
-        userName: _user!.userName,
-        email: _user!.email,
-        profileImageUrl: url,
-      ); // Update the local user data
-      notifyListeners();
-    } catch (e) {
-      print(e);
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      try {
+        final ref = FirebaseStorage.instance
+            .ref()
+            .child('user_images')
+            .child(user.uid + '.jpg');
+        await ref.putFile(newImage);
+        final url = await ref.getDownloadURL();
+        await user.updateProfile(photoURL: url);
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .update({
+          'pickedImage': url,
+        });
+        _user = AppUser(
+          id: _user!.id,
+          userName: _user!.userName,
+          email: _user!.email,
+          profileImageUrl: url,
+          enrolledGroups: _user!.enrolledGroups,
+        ); // Update the local user data
+        notifyListeners();
+      } catch (e) {
+        print(e);
+      }
     }
   }
-}
-  // Add more methods for updating user data as needed
+
+  Future<void> addEnrolledGroup(String groupId) async {
+    final firebaseUser = _auth.currentUser;
+    if (firebaseUser != null && _user != null) {
+      try {
+        // Update the user's enrolledGroups in Firestore
+        await _firestore.collection('users').doc(firebaseUser.uid).update({
+          'enrolledGroups': FieldValue.arrayUnion([groupId])
+        });
+
+        // Update the local user data to include the new group
+        List<String> updatedGroups = List.from(_user!.enrolledGroups ?? [])
+          ..add(groupId);
+        _user = AppUser(
+          id: _user!.id,
+          userName: _user!.userName,
+          email: _user!.email,
+          profileImageUrl: _user!.profileImageUrl,
+          enrolledGroups:
+              updatedGroups, // include the enrolledGroups field in your AppUser model if it's not already there
+        );
+        notifyListeners();
+      } catch (e) {
+        print(e);
+      }
+    }
+  }
+
+  Future<AppUser?> fetchUserDetails(String userId) async {
+    try {
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .get();
+
+      if (userDoc.exists) {
+        return AppUser.fromFirestore(userDoc);
+      }
+    } catch (e) {
+      // Handle exceptions
+      print(e); // Consider proper error handling
+    }
+    return null;
+  }
 }

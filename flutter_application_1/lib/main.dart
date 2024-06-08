@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/View/login/login_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_application_1/providers/chat_provider.dart';
+import 'package:flutter_application_1/providers/chatroom_provider.dart';
+import 'package:flutter_application_1/providers/group_provider.dart';
 import 'package:flutter_application_1/providers/user_data_provider.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
@@ -14,6 +17,9 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => UserDataProvider()),
+        ChangeNotifierProvider(create: (context) => GroupProvider()),
+        ChangeNotifierProvider(create: (context) => ChatProvider()),
+        ChangeNotifierProvider(create: (context) => ChatRoomProvider()),
       ],
       child: MyApp(),
     ),

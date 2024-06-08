@@ -4,7 +4,9 @@ import 'package:flutter_application_1/View/home/chat/widgets/message_widget.dart
 import 'package:flutter_application_1/View/home/chat/widgets/send_message_widget.dart';
 
 class Chatroom extends StatefulWidget {
-  const Chatroom({super.key});
+  final String chatRoomId;
+
+  const Chatroom({Key? key, required this.chatRoomId}) : super(key: key);
 
   @override
   State<Chatroom> createState() => _ChatroomState();
@@ -17,17 +19,16 @@ class _ChatroomState extends State<Chatroom> {
       appBar: AppBar(
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
-          onPressed: () => Navigator.of(context).pop(),  // Navigate back
+          onPressed: () => Navigator.of(context).pop(), // Navigate back
         ),
         title: Text('Chatroom', style: TextStyle(fontSize: 18)), // Small title
       ),
-      body: 
-      Column(children: [
-        Expanded(child: MessageWidget()),
-
-        SendMessageWidget(),
-      ],)
-      
+      body: Column(
+        children: [
+          Expanded(child: MessageWidget(chatRoomId: widget.chatRoomId)),
+          SendMessageWidget(chatRoomId: widget.chatRoomId),
+        ],
+      ),
     );
   }
 }
