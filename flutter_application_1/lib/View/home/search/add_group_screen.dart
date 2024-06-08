@@ -19,7 +19,7 @@ class _AddGroupScreenState extends State<AddGroupScreen> {
   final TextEditingController _customCategoryController = TextEditingController();
   final TextEditingController _customSubcategoryController = TextEditingController();
   final TextEditingController _groupLimitController = TextEditingController();
-  final TextEditingController _groupDurationController = TextEditingController();
+  final TextEditingController _expiryTimeController = TextEditingController();
   final ImagePicker _picker = ImagePicker();
   File? _groupImage;
 
@@ -74,17 +74,21 @@ class _AddGroupScreenState extends State<AddGroupScreen> {
     void addGroup() async {
       final String groupName = _groupNameController.text;
       final String groupDescription = _groupDescriptionController.text;
+      final int groupLimit = int.tryParse(_groupLimitController.text) ?? 0;
+      final int expiryHours = int.tryParse(_expiryTimeController.text) ?? 0;
+      final Timestamp expiryTime = Timestamp.fromDate(
+          DateTime.now().add(Duration(hours: expiryHours)));
       final String category = _isCustomCategory
           ? _customCategoryController.text
           : _selectedCategory;
       final String subcategory = _isCustomSubcategory
           ? _customSubcategoryController.text
           : _selectedSubcategory;
-      final int groupLimit = int.tryParse(_groupLimitController.text) ?? 10;
-      final int groupDuration = int.tryParse(_groupDurationController.text) ?? 24;
 
       if (groupName.isNotEmpty &&
           groupDescription.isNotEmpty &&
+          groupLimit > 0 &&
+          expiryHours > 0 &&
           category.isNotEmpty &&
           subcategory.isNotEmpty &&
           user != null) {
@@ -93,10 +97,6 @@ class _AddGroupScreenState extends State<AddGroupScreen> {
           imageUrl = await _uploadImage(_groupImage!);
         }
 
-        final Timestamp expiryTime = Timestamp.fromDate(
-          DateTime.now().add(Duration(hours: groupDuration)),
-        );
-
         // Create a new group document in the 'groups' collection
         DocumentReference group = await FirebaseFirestore.instance.collection('groups').add({
           'name': groupName,
@@ -104,10 +104,10 @@ class _AddGroupScreenState extends State<AddGroupScreen> {
           'category': category,
           'subcategory': subcategory,
           'imageUrl': imageUrl ?? '', // Save empty string if no image is uploaded
-          'enrolledUsers': [user.id], // Initially enroll the current user
           'groupLimit': groupLimit,
           'currentMembers': 1,
-          'expiryTime': expiryTime, // Add expiry time
+          'expiryTime': expiryTime,
+          'enrolledUsers': [user.id] // Initially enroll the current user
         });
 
         // Add the group to the user's 'enrolledGroups'
@@ -124,7 +124,7 @@ class _AddGroupScreenState extends State<AddGroupScreen> {
         _customCategoryController.clear();
         _customSubcategoryController.clear();
         _groupLimitController.clear();
-        _groupDurationController.clear();
+        _expiryTimeController.clear();
 
         // Navigate back
         Navigator.of(context).pop();
@@ -163,7 +163,6 @@ class _AddGroupScreenState extends State<AddGroupScreen> {
                 ),
               ),
             ),
-            SizedBox(height: 20),
             TextField(
               controller: _groupNameController,
               decoration: InputDecoration(hintText: 'Group Name'),
@@ -178,8 +177,8 @@ class _AddGroupScreenState extends State<AddGroupScreen> {
               keyboardType: TextInputType.number,
             ),
             TextField(
-              controller: _groupDurationController,
-              decoration: InputDecoration(hintText: 'Group Duration (hours)'),
+              controller: _expiryTimeController,
+              decoration: InputDecoration(hintText: 'Expiry Time (in hours)'),
               keyboardType: TextInputType.number,
             ),
             SizedBox(height: 20),

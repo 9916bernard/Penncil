@@ -8,8 +8,9 @@ class Group {
   final String category;
   final String subcategory;
   final String imageUrl;
-  final int groupLimit; // Add this field
-  final int currentMembers; // Add this field
+  final int groupLimit;
+  final int currentMembers;
+  final Timestamp expiryTime; // Add this field
 
   Group({
     required this.id,
@@ -21,10 +22,11 @@ class Group {
     required this.imageUrl,
     required this.groupLimit,
     required this.currentMembers,
+    required this.expiryTime, // Initialize this field
   });
 
   factory Group.fromFirestore(DocumentSnapshot doc) {
-    Map data = doc.data() as Map;
+    Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
     return Group(
       id: doc.id,
       name: data['name'] ?? '',
@@ -35,6 +37,21 @@ class Group {
       imageUrl: data['imageUrl'] ?? '',
       groupLimit: data['groupLimit'] ?? 0,
       currentMembers: data['currentMembers'] ?? 0,
+      expiryTime: data['expiryTime'] ?? Timestamp.now(), // Default to current time if not provided
     );
+  }
+
+  Map<String, dynamic> toFirestore() {
+    return {
+      'name': name,
+      'description': description,
+      'enrolledUsers': enrolledUsers,
+      'category': category,
+      'subcategory': subcategory,
+      'imageUrl': imageUrl,
+      'groupLimit': groupLimit,
+      'currentMembers': currentMembers,
+      'expiryTime': expiryTime,
+    };
   }
 }

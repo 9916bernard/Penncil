@@ -5,7 +5,12 @@ import 'package:flutter_application_1/View/home/chat/chatroom_page.dart';
 import 'package:flutter_application_1/providers/chatroom_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class ChatScreen extends StatelessWidget {
+class ChatScreen extends StatefulWidget {
+  @override
+  _ChatScreenState createState() => _ChatScreenState();
+}
+
+class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     final chatRoomProvider = Provider.of<ChatRoomProvider>(context);
