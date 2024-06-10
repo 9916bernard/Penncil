@@ -1,3 +1,4 @@
+import 'package:animation_search_bar/animation_search_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/View/global_widgets/add_group_widget.dart';
 import 'package:flutter_application_1/View/home/main/group_detail_screen.dart';
@@ -5,6 +6,7 @@ import 'package:flutter_application_1/models/group_model.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_application_1/providers/group_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dropdown_button2/dropdown_button2.dart';
 
 class SearchScreen extends StatefulWidget {
   @override
@@ -16,6 +18,8 @@ class _SearchScreenState extends State<SearchScreen> {
   String selectedCategory = "All";
   String selectedSubcategory = "All";
   Map<String, Map<String, dynamic>> userCache = {};
+
+  final TextEditingController _searchController = TextEditingController();
 
   final List<String> categories = ["All", "Sports", "Study", "Hangout", "Travel", "Game"];
   final Map<String, List<String>> subcategories = {
@@ -39,6 +43,20 @@ class _SearchScreenState extends State<SearchScreen> {
   void initState() {
     super.initState();
     selectedSubcategory = subcategories[selectedCategory]?.first ?? "All";
+    _searchController.addListener(_onSearchChanged);
+  }
+
+  @override
+  void dispose() {
+    _searchController.removeListener(_onSearchChanged);
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _onSearchChanged() {
+    setState(() {
+      searchQuery = _searchController.text;
+    });
   }
 
   @override
@@ -56,59 +74,153 @@ class _SearchScreenState extends State<SearchScreen> {
     }).toList();
 
     return Scaffold(
+      backgroundColor: Color.fromARGB(8, 38, 135, 219),
+      appBar: PreferredSize(
+        
+        preferredSize: Size(double.infinity, 70),
+        child: SafeArea(
+          child: Container(
+            decoration: BoxDecoration(color: Color.fromARGB(8, 38, 135, 219), boxShadow: [
+              
+            ]),
+            alignment: Alignment.center,
+            child: AnimationSearchBar(
+              centerTitle: 'DoItWithMe',
+              onChanged: (text) {
+                setState(() {
+                  searchQuery = text.trim();
+                });
+              },
+              searchTextEditingController: _searchController,
+              horizontalPadding: 5,
+              closeIconColor: Colors.black,
+              searchIconColor: Colors.black,
+              cursorColor: Colors.black,
+              hintText: 'Search here...',
+              textStyle: TextStyle(color: Colors.white),
+              hintStyle: TextStyle(color: Colors.white70),
+              searchFieldDecoration: BoxDecoration(
+                color: Colors.blueGrey.shade700,
+                border: Border.all(color: Colors.black.withOpacity(.2), width: .5),
+                borderRadius: BorderRadius.circular(15),
+              ),
+              isBackButtonVisible: false, // Hide the back button
+            ),
+          ),
+        ),
+      ),
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              onChanged: (value) {
-                setState(() {
-                  searchQuery = value.trim();
-                });
-              },
-              decoration: InputDecoration(
-                labelText: "Search for groups",
-                border: OutlineInputBorder(),
-                suffixIcon: Icon(Icons.search),
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 10.0),
             child: Row(
               children: [
                 Expanded(
-                  child: DropdownButton<String>(
-                    value: selectedCategory,
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        selectedCategory = newValue!;
-                        selectedSubcategory = subcategories[selectedCategory]?.first ?? "All";
-                      });
-                    },
-                    items: categories.map<DropdownMenuItem<String>>((String category) {
-                      return DropdownMenuItem<String>(
-                        value: category,
-                        child: Text(category),
-                      );
-                    }).toList(),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton2<String>(
+                      isExpanded: true,
+                      value: selectedCategory,
+                      hint: Text(
+                        'Select Category',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.white,
+                        ),
+                      ),
+                      items: categories.map<DropdownMenuItem<String>>((String category) {
+                        return DropdownMenuItem<String>(
+                          value: category,
+                          child: Text(
+                            category,
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        );
+                      }).toList(),
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          selectedCategory = newValue!;
+                          selectedSubcategory = subcategories[selectedCategory]?.first ?? "All";
+                        });
+                      },
+                      buttonStyleData: ButtonStyleData(
+                        padding: EdgeInsets.symmetric(horizontal: 16),
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: Color.fromARGB(255, 18, 139, 238),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      dropdownStyleData: DropdownStyleData(
+                        decoration: BoxDecoration(
+                          color: Color.fromARGB(255, 127, 187, 236),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      iconStyleData: IconStyleData(
+                        icon: Icon(
+                          Icons.arrow_drop_down,
+                          color: Colors.white,
+                        ),
+                      ),
+                      menuItemStyleData: MenuItemStyleData(
+                        height: 50,
+                        padding: EdgeInsets.symmetric(horizontal: 16),
+                      ),
+                    ),
                   ),
                 ),
                 SizedBox(width: 10),
                 Expanded(
-                  child: DropdownButton<String>(
-                    value: selectedSubcategory,
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        selectedSubcategory = newValue!;
-                      });
-                    },
-                    items: (subcategories[selectedCategory] ?? ["All"]).map<DropdownMenuItem<String>>((String subcategory) {
-                      return DropdownMenuItem<String>(
-                        value: subcategory,
-                        child: Text(subcategory),
-                      );
-                    }).toList(),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton2<String>(
+                      isExpanded: true,
+                      value: selectedSubcategory,
+                      hint: Text(
+                        'Select Subcategory',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.white,
+                        ),
+                      ),
+                      items: (subcategories[selectedCategory] ?? ["All"]).map<DropdownMenuItem<String>>((String subcategory) {
+                        return DropdownMenuItem<String>(
+                          value: subcategory,
+                          child: Text(
+                            subcategory,
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        );
+                      }).toList(),
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          selectedSubcategory = newValue!;
+                        });
+                      },
+                      buttonStyleData: ButtonStyleData(
+                        padding: EdgeInsets.symmetric(horizontal: 16),
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: Color.fromARGB(255, 18, 139, 238),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      dropdownStyleData: DropdownStyleData(
+                        decoration: BoxDecoration(
+                          color: Color.fromARGB(255, 127, 187, 236),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      iconStyleData: IconStyleData(
+                        icon: Icon(
+                          Icons.arrow_drop_down,
+                          color: Colors.white,
+                        ),
+                      ),
+                      menuItemStyleData: MenuItemStyleData(
+                        height: 50,
+                        padding: EdgeInsets.symmetric(horizontal: 16),
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -124,8 +236,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) =>
-                            GroupDetailScreen(groupId: group.id),
+                        builder: (context) => GroupDetailScreen(groupId: group.id),
                       ),
                     );
                   },
@@ -187,8 +298,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                 (index) {
                                   String userId = group.enrolledUsers[index];
                                   if (!userCache.containsKey(userId)) {
-                                    userCache[userId] =
-                                        {}; // Initialize with an empty map
+                                    userCache[userId] = {}; // Initialize with an empty map
                                     FirebaseFirestore.instance
                                         .collection('users')
                                         .doc(userId)
@@ -207,9 +317,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                     child: userCache[userId]!.isNotEmpty
                                         ? CircleAvatar(
                                             backgroundImage: NetworkImage(
-                                                userCache[userId]![
-                                                        'pickedImage'] ??
-                                                    'default_user_image_url'),
+                                                userCache[userId]!['pickedImage'] ?? 'default_user_image_url'),
                                             radius: 20,
                                           )
                                         : CircleAvatar(
@@ -230,7 +338,6 @@ class _SearchScreenState extends State<SearchScreen> {
               },
             ),
           ),
-          AddGroupWidget(),
         ],
       ),
     );

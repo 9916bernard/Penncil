@@ -98,114 +98,207 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
+      // Prevent overflow when keyboard opens
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         // Using AppBar for the back button
         title: Text("Login"),
       ),
-      body: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              TextButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => HomeScreen()),
-                    );
-                  },
-                  child: Text('Free pass')),
-              TextFormField(
-                key: ValueKey(3),
-                validator: (value) {
-                  if (value!.isEmpty || !value.contains('@')) {
-                    return 'Please enter a valid email address';
-                  }
-                  return null;
-                },
-                onSaved: (value) {
-                  userEmail = value!;
-                },
-                onChanged: (value) {
-                  userEmail = value;
-                },
-                decoration: InputDecoration(
-                  labelText: 'Email',
-                  border: OutlineInputBorder(),
-                ),
-                keyboardType: TextInputType.emailAddress,
+      body: Stack(
+        children: [
+          // Background Image
+          Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage(
+                    "assets/background.jpg"), // Your background image
+                fit: BoxFit.cover,
               ),
-              SizedBox(height: 20),
-              TextFormField(
-                key: ValueKey(4),
-                validator: (value) {
-                  if (value!.isEmpty || value.length < 6) {
-                    return 'Please enter at least 6 characters';
-                  }
-                  return null;
-                },
-                onSaved: (value) {
-                  userPassword = value!;
-                },
-                onChanged: (value) {
-                  userPassword = value;
-                },
-                decoration: InputDecoration(
-                  labelText: 'Password',
-                  border: OutlineInputBorder(),
-                ),
-                obscureText: true, // Hide the text being entered
-              ),
-              SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () async {
-                  _tryValidation();
-                  try {
-                    final newUser =
-                        await _authentication.signInWithEmailAndPassword(
-                            email: userEmail, password: userPassword);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => HomeScreen()),
-                    );
-                  } on FirebaseAuthException catch (e) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(e.toString()),
-                      ),
-                    );
-                  }
-                },
-                child: Text('Login'),
-              ),
-              TextButton(
-                onPressed:
-                    signUpWithGoogle, // Call the googleSignUp method when the button is pressed
-                child: Text('Log in with Google'),
-              ),
-              SizedBox(height: 50),
-              Center(child: Text('Don\'t have an account? Sign up')),
-              TextButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => SignupScreen()),
-                  );
-                },
-                child: Text('Sign up with Email'),
-              ),
-              TextButton(
-                onPressed:
-                    signUpWithGoogle, // Call the googleSignUp method when the button is pressed
-                child: Text('Sign up with Google'),
-              ),
-            ],
+            ),
           ),
-        ),
+          Center(
+            child: Padding(
+              padding: EdgeInsets.all(16.0),
+              child: SingleChildScrollView(
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // Add some space at the top
+                      SizedBox(height: 50),
+                      Text(
+                        'Welcome Back!',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      Text(
+                        'Login to continue',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.black,
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      TextFormField(
+                        key: ValueKey(3),
+                        validator: (value) {
+                          if (value!.isEmpty || !value.contains('@')) {
+                            return 'Please enter a valid email address';
+                          }
+                          return null;
+                        },
+                        onSaved: (value) {
+                          userEmail = value!;
+                        },
+                        onChanged: (value) {
+                          userEmail = value;
+                        },
+                        decoration: InputDecoration(
+                          labelText: 'Email',
+                          labelStyle: TextStyle(color: Colors.black),
+                          fillColor: Colors.white24,
+                          filled: true,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        keyboardType: TextInputType.emailAddress,
+                        style: TextStyle(color: Colors.black),
+                      ),
+                      SizedBox(height: 20),
+                      TextFormField(
+                        key: ValueKey(4),
+                        validator: (value) {
+                          if (value!.isEmpty || value.length < 6) {
+                            return 'Please enter at least 6 characters';
+                          }
+                          return null;
+                        },
+                        onSaved: (value) {
+                          userPassword = value!;
+                        },
+                        onChanged: (value) {
+                          userPassword = value;
+                        },
+                        decoration: InputDecoration(
+                          labelText: 'Password',
+                          labelStyle: TextStyle(color: Colors.black),
+                          fillColor: Colors.white24,
+                          filled: true,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        obscureText: true, // Hide the text being entered
+                        style: TextStyle(color: Colors.black),
+                      ),
+                      SizedBox(height: 20),
+                      ElevatedButton(
+                        onPressed: () async {
+                          _tryValidation();
+                          try {
+                            final newUser = await _authentication
+                                .signInWithEmailAndPassword(
+                                    email: userEmail, password: userPassword);
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => HomeScreen()),
+                            );
+                          } on FirebaseAuthException catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(e.toString()),
+                              ),
+                            );
+                          }
+                        },
+                        child: Text('Login'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blueAccent,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          padding: EdgeInsets.symmetric(vertical: 15),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: signUpWithGoogle,
+                        child: Text('Log in with Google'),
+                        style: TextButton.styleFrom(
+                          foregroundColor: Colors.black,
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      TextButton(
+                        onPressed: () {
+                          // Add "Forgot Password" functionality
+                          if (userEmail.isNotEmpty) {
+                            _authentication.sendPasswordResetEmail(
+                                email: userEmail);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Password reset email sent!'),
+                              ),
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                    'Please enter your email to reset password'),
+                              ),
+                            );
+                          }
+                        },
+                        child: Text('Forgot Password?'),
+                        style: TextButton.styleFrom(
+                          foregroundColor: Colors.black,
+                        ),
+                      ),
+                      SizedBox(height: 50),
+                      Center(
+                        child: Text(
+                          'Don\'t have an account? Sign up',
+                          style: TextStyle(color: Colors.black),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => SignupScreen()),
+                          );
+                        },
+                        child: Text('Sign up with Email'),
+                        style: TextButton.styleFrom(
+                          foregroundColor: Colors.black,
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: signUpWithGoogle,
+                        child: Text('Sign up with Google'),
+                        style: TextButton.styleFrom(
+                          foregroundColor: Colors.black,
+                        ),
+                      ),
+                      // Add some space at the bottom
+                      SizedBox(height: 20),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

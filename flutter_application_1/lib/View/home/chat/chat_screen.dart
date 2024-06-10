@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter_application_1/View/home/chat/chatroom_page.dart';
 import 'package:flutter_application_1/providers/chatroom_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:badges/badges.dart' as badges;
 
 class ChatScreen extends StatefulWidget {
   @override
@@ -22,6 +23,27 @@ class _ChatScreenState extends State<ChatScreen> {
     }
 
     return Scaffold(
+      backgroundColor: Color.fromARGB(8, 38, 135, 219),
+      appBar: PreferredSize(
+        preferredSize: Size(double.infinity, 70),
+        child: SafeArea(
+          child: Container(
+            
+            decoration: BoxDecoration(color: Color.fromARGB(8, 38, 135, 219), boxShadow: [
+              
+            ]),
+            alignment: Alignment.center,
+            child: Text(
+              'Chats',
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            )
+          ),
+        ),
+      ),
       body: FutureBuilder<List<String>>(
         future: chatRoomProvider.fetchUserChatRooms(user.id),
         builder: (context, snapshot) {
@@ -83,9 +105,13 @@ class _ChatScreenState extends State<ChatScreen> {
           );
         },
         child: Card(
-          color: Color.fromARGB(139, 250, 250, 250),
+          color: Colors.white,
+          elevation: 3,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
           child: Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(12.0),
             child: Row(
               children: [
                 Container(
@@ -104,7 +130,8 @@ class _ChatScreenState extends State<ChatScreen> {
                             if (userSnapshot.connectionState ==
                                     ConnectionState.done &&
                                 userSnapshot.data != null) {
-                              Map<String, dynamic> userData = userSnapshot.data!
+                              Map<String, dynamic> userData = userSnapshot
+                                  .data!
                                   .data() as Map<String, dynamic>;
                               return Positioned(
                                 left: index * 12.0,
@@ -140,23 +167,27 @@ class _ChatScreenState extends State<ChatScreen> {
                             style: TextStyle(
                               color: Colors.black,
                               fontWeight: FontWeight.bold,
+                              fontSize: 16,
                             ),
                           ),
                           SizedBox(width: 4),
                           Text(
                             '${participants.length}',
                             style: TextStyle(
-                              color: Colors.black,
+                              color: Colors.black54,
+                              fontSize: 14,
                             ),
                           ),
                         ],
                       ),
+                      SizedBox(height: 4),
                       Text(
                         lastMessage,
                         style: TextStyle(
-                          color: Colors.black,
+                          color: Colors.black54,
                           fontSize: 12,
                         ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ),
@@ -166,21 +197,20 @@ class _ChatScreenState extends State<ChatScreen> {
                     Text(
                       _formatTimestamp(timestamp),
                       style: TextStyle(
-                        color: Colors.black,
+                        color: Colors.black54,
                         fontSize: 12,
                       ),
                     ),
                     SizedBox(height: 4),
-                    CircleAvatar(
-                      radius: 8,
-                      backgroundColor: Colors.red,
-                      child: Text(
+                    badges.Badge(
+                      badgeContent: Text(
                         '1',
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 10,
                         ),
                       ),
+                      
                     ),
                   ],
                 ),
@@ -196,8 +226,8 @@ class _ChatScreenState extends State<ChatScreen> {
     final date = timestamp.toDate();
     final hours = date.hour;
     final minutes = date.minute.toString().padLeft(2, '0');
-    final period = hours >= 12 ? 'pm' : 'am';
+    final period = hours >= 12 ? 'PM' : 'AM';
     final formattedHour = hours % 12 == 0 ? 12 : hours % 12;
-    return '$period $formattedHour:$minutes';
+    return '$formattedHour:$minutes $period';
   }
 }

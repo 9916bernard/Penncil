@@ -41,7 +41,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final user = userDataProvider.user; // Use the user data from the provider
 
     return Scaffold(
+      backgroundColor: Color.fromARGB(8, 38, 135, 219),
       appBar: AppBar(
+        automaticallyImplyLeading: false,
+        backgroundColor: Color.fromARGB(8, 38, 135, 219),
         actions: [
           IconButton(
             icon: Icon(Icons.exit_to_app),
@@ -67,10 +70,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     CircularProgressIndicator(), // Show a loading indicator while user data is being fetched
               )
             else
-              CircleAvatar(
-                backgroundImage: NetworkImage(user.profileImageUrl ??
-                    'default_image_url'), // Use the profileImageUrl from the provider
-                radius: 50,
+              Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: Colors.black, // Border color
+                    width: 3.0, // Border width
+                  ),
+                ),
+                child: CircleAvatar(
+                  backgroundImage: NetworkImage(user.profileImageUrl ??
+                      'default_image_url'), // Use the profileImageUrl from the provider
+                  radius: 50,
+                ),
               ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 20.0),
@@ -102,7 +114,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: Text('Change Username'),
               ),
             ),
-            AddGroupWidget(),
           ],
         ),
       ),
