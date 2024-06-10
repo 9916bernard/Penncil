@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/View/home/search/add_group_screen.dart';
+import 'package:flutter_application_1/View/home/add_group_screen.dart';
 
 class AddGroupWidget extends StatelessWidget {
   AddGroupWidget({Key? key}) : super(key: key);

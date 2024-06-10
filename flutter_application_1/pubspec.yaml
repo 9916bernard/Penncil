@@ -43,6 +43,13 @@ dependencies:
   image_picker: ^1.0.5
   firebase_storage: ^11.5.6
   provider: ^6.1.1
+  dropdown_button2: ^2.3.8
+  curved_navigation_bar: ^1.0.5
+  animation_search_bar: ^0.0.10
+  badges: ^3.1.2
+  circular_profile_avatar: ^2.0.5
+  flutter_login: ^5.0.0
+
 
 dev_dependencies:
   flutter_test:

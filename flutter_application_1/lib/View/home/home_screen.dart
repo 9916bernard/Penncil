@@ -1,8 +1,11 @@
+import 'package:animation_search_bar/animation_search_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/View/home/chat/chat_screen.dart';
 import 'package:flutter_application_1/View/home/profile/profile_screen.dart';
 import 'package:flutter_application_1/View/home/search/search_screen.dart';
+import 'package:flutter_application_1/View/home/add_group_screen.dart';
+import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -14,6 +17,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final _authentication = FirebaseAuth.instance;
   User? loggedUser;
+  TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
@@ -34,10 +38,12 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   int _selectedIndex = 0; // The default selected index for the BottomNavigationBar
+  final GlobalKey<CurvedNavigationBarState> _bottomNavigationKey = GlobalKey();
 
   // Pages that correspond to the tabs in the BottomNavigationBar
   final List<Widget> _pages = <Widget>[
     SearchScreen(),
+    AddGroupScreen(), // Add Group screen
     ChatScreen(), // Chat screen
     ProfileScreen(), // Profile screen
   ];
@@ -51,29 +57,20 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('DoItWithMe'),
-        automaticallyImplyLeading: false,
-      ),
+      
       body: _pages[_selectedIndex], // Display the page selected by the bottom navigation bar
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            label: 'Search',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.chat),
-            label: 'Chat',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
+      bottomNavigationBar: CurvedNavigationBar(
+        key: _bottomNavigationKey,
+        backgroundColor: Colors.white,
+        color: Color.fromARGB(255, 8, 122, 216),
+        buttonBackgroundColor: Color.fromARGB(255, 8, 122, 216),
+        height: 60,
+        items: <Widget>[
+          Icon(Icons.explore_outlined, size: 30, color: Colors.white),
+          Icon(Icons.add, size: 30, color: Colors.white), // Add group screen
+          Icon(Icons.chat, size: 30, color: Colors.white), // Chat screen
+          Icon(Icons.person, size: 30, color: Colors.white),
         ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: Colors.deepPurple[800],
-        unselectedItemColor: Colors.grey[600], // Adjust unselected item color for better visibility
         onTap: _onItemTapped,
       ),
     );
