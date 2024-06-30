@@ -111,7 +111,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
                       },
                     ),
                     ElevatedButton(
-                      onPressed: group!.currentMembers >= group!.groupLimit
+                      onPressed: group!.currentMembers >= group!.groupLimit && group!.groupLimit != -1
                           ? () {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
@@ -143,7 +143,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
   }
 
   void enrollInGroup(GroupProvider provider) async {
-    if (group!.currentMembers >= group!.groupLimit) {
+    if (group!.currentMembers >= group!.groupLimit && group!.groupLimit != -1) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Group is full'),

@@ -36,6 +36,8 @@ class _AddGroupScreenState extends State<AddGroupScreen> {
   String _selectedSubcategory = "Soccer";
   bool _isCustomCategory = false;
   bool _isCustomSubcategory = false;
+  bool _noLimit = false;
+  bool _noExpiry = false;
 
   Duration _expiryDuration = Duration(hours: 1);
 
@@ -76,9 +78,10 @@ class _AddGroupScreenState extends State<AddGroupScreen> {
     void addGroup() async {
       final String groupName = _groupNameController.text;
       final String groupDescription = _groupDescriptionController.text;
-      final int groupLimit = int.tryParse(_groupLimitController.text) ?? 0;
-      final Timestamp expiryTime = Timestamp.fromDate(
-          DateTime.now().add(_expiryDuration));
+      final int groupLimit = _noLimit ? -1 : int.tryParse(_groupLimitController.text) ?? 0;
+      final Timestamp expiryTime = _noExpiry
+          ? Timestamp.fromDate(DateTime.now().add(Duration(days: 365 * 100))) // Set a far future expiry date if no expiry
+          : Timestamp.fromDate(DateTime.now().add(_expiryDuration));
       final String category = _isCustomCategory
           ? _customCategoryController.text
           : _selectedCategory;
@@ -88,8 +91,8 @@ class _AddGroupScreenState extends State<AddGroupScreen> {
 
       if (groupName.isNotEmpty &&
           groupDescription.isNotEmpty &&
-          groupLimit > 0 &&
-          _expiryDuration.inHours > 0 &&
+          (groupLimit > 0 || _noLimit) &&
+          (_expiryDuration.inHours > 0 || _noExpiry) &&
           category.isNotEmpty &&
           subcategory.isNotEmpty &&
           user != null) {
@@ -173,53 +176,84 @@ class _AddGroupScreenState extends State<AddGroupScreen> {
                     controller: _groupDescriptionController,
                     decoration: InputDecoration(hintText: 'Group Description'),
                   ),
-                  TextField(
-                    controller: _groupLimitController,
-                    decoration: InputDecoration(hintText: 'Group Limit'),
-                    keyboardType: TextInputType.number,
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: _groupLimitController,
+                          decoration: InputDecoration(hintText: 'Group Limit'),
+                          keyboardType: TextInputType.number,
+                          enabled: !_noLimit,
+                        ),
+                      ),
+                      Checkbox(
+                        value: _noLimit,
+                        onChanged: (bool? value) {
+                          setState(() {
+                            _noLimit = value ?? false;
+                          });
+                        },
+                      ),
+                      Text('No Limit'),
+                    ],
                   ),
                   SizedBox(height: 20),
-                  Text(
-                    'Expiry Time',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                  GestureDetector(
-                    onTap: () async {
-                      final Duration? result = await showModalBottomSheet<Duration>(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return Container(
-                            height: 200,
-                            child: CupertinoTimerPicker(
-                              mode: CupertinoTimerPickerMode.hm,
-                              initialTimerDuration: _expiryDuration,
-                              onTimerDurationChanged: (Duration newDuration) {
+                  Row(
+                    children: [
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () async {
+                            if (!_noExpiry) {
+                              final Duration? result = await showModalBottomSheet<Duration>(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return Container(
+                                    height: 200,
+                                    child: CupertinoTimerPicker(
+                                      mode: CupertinoTimerPickerMode.hm,
+                                      initialTimerDuration: _expiryDuration,
+                                      onTimerDurationChanged: (Duration newDuration) {
+                                        setState(() {
+                                          _expiryDuration = newDuration;
+                                        });
+                                      },
+                                    ),
+                                  );
+                                },
+                              );
+                              if (result != null) {
                                 setState(() {
-                                  _expiryDuration = newDuration;
+                                  _expiryDuration = result;
                                 });
-                              },
+                              }
+                            }
+                          },
+                          child: Container(
+                            padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: Colors.black.withOpacity(.2)),
                             ),
-                          );
+                            child: Text(
+                              _noExpiry
+                                  ? 'No Expiry'
+                                  : 'Expiry Time: ${_expiryDuration.inHours} hours',
+                              style: TextStyle(fontSize: 16),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Checkbox(
+                        value: _noExpiry,
+                        onChanged: (bool? value) {
+                          setState(() {
+                            _noExpiry = value ?? false;
+                          });
                         },
-                      );
-                      if (result != null) {
-                        setState(() {
-                          _expiryDuration = result;
-                        });
-                      }
-                    },
-                    child: Container(
-                      padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: Colors.black.withOpacity(.2)),
                       ),
-                      child: Text(
-                        'Expiry Time: ${_expiryDuration.inHours} hours',
-                        style: TextStyle(fontSize: 16),
-                      ),
-                    ),
+                      Text('No Expiry'),
+                    ],
                   ),
                   SizedBox(height: 20),
                   Text(
@@ -286,7 +320,6 @@ class _AddGroupScreenState extends State<AddGroupScreen> {
             child: TextButton(
               onPressed: addGroup,
               child: Text('Create Group'),
-              
             ),
           ),
         ],
