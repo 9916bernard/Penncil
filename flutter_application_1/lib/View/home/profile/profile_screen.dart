@@ -1,10 +1,9 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter_application_1/View/global_widgets/add_group_widget.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:flutter_application_1/View/login/login_screen.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_application_1/View/login/login_screen.dart';
 import 'package:flutter_application_1/providers/user_data_provider.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -16,6 +15,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final FirebaseAuth _authentication = FirebaseAuth.instance;
   final ImagePicker _picker = ImagePicker();
   final TextEditingController _usernameController = TextEditingController();
+  bool _isEditingUsername = false;
 
   @override
   void initState() {
@@ -70,50 +70,84 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     CircularProgressIndicator(), // Show a loading indicator while user data is being fetched
               )
             else
-              Container(
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: Colors.black, // Border color
-                    width: 3.0, // Border width
+              Column(
+                children: [
+                  GestureDetector(
+                    onTap: pickImage,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: Colors.black, // Border color
+                          width: 3.0, // Border width
+                        ),
+                      ),
+                      child: CircleAvatar(
+                        backgroundImage: NetworkImage(user.profileImageUrl ??
+                            'default_image_url'), // Use the profileImageUrl from the provider
+                        radius: 50,
+                      ),
+                    ),
                   ),
-                ),
-                child: CircleAvatar(
-                  backgroundImage: NetworkImage(user.profileImageUrl ??
-                      'default_image_url'), // Use the profileImageUrl from the provider
-                  radius: 50,
-                ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 20.0),
+                    child: Center(
+                      child: Text(
+                        user.userName,
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  Container(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          _isEditingUsername = !_isEditingUsername;
+                        });
+                      },
+                      child: Text('Change Username'),
+                    ),
+                  ),
+                  AnimatedContainer(
+                    duration: Duration(milliseconds: 300),
+                    height: _isEditingUsername ? 140 : 0,
+                    child: SingleChildScrollView(
+                      child: _isEditingUsername
+                          ? Column(
+                              children: [
+                                SizedBox(height: 10),
+                                TextFormField(
+                                  controller: _usernameController,
+                                  decoration: InputDecoration(
+                                    labelText: 'Enter new username',
+                                    border: OutlineInputBorder(),
+                                  ),
+                                ),
+                                SizedBox(height: 10),
+                                ElevatedButton(
+                                  onPressed: () {
+                                    if (user != null) {
+                                      userDataProvider
+                                          .updateUserName(_usernameController.text);
+                                    }
+                                    setState(() {
+                                      _isEditingUsername = false;
+                                    });
+                                  },
+                                  child: Text('Save'),
+                                ),
+                              ],
+                            )
+                          : Container(),
+                    ),
+                  ),
+                ],
               ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 20.0),
-              child: TextButton(
-                onPressed: pickImage,
-                child: const Text("Change Profile Picture"),
-              ),
-            ),
-            Container(
-              padding: EdgeInsets.symmetric(vertical: 10),
-              child: TextFormField(
-                controller: _usernameController,
-                decoration: InputDecoration(
-                  labelText: user?.userName ??
-                      'Loading...', // Use the userName from the provider
-                  border: OutlineInputBorder(),
-                ),
-              ),
-            ),
-            Container(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  if (user != null) {
-                    // Check if the user data is available
-                    userDataProvider.updateUserName(_usernameController.text);
-                  }
-                },
-                child: Text('Change Username'),
-              ),
-            ),
           ],
         ),
       ),
